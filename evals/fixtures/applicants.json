@@ -110,5 +110,47 @@
     "exceptionalSlope": false,
     "expected": "advance",
     "note": "Rule ordering check: a strong, substantive artifact (rule 1) must win even though sdkRoleAppOnly is also true and exceptionalSlope is false (which would otherwise trip rule 5) — rule 1 is evaluated first: advance."
+  },
+  {
+    "id": "fixture-I",
+    "name": "Test Candidate I",
+    "email": "i@example.test",
+    "role": "ios-sdk",
+    "hasArtifactLink": false,
+    "artifactSubstantive": false,
+    "fraudDepth": null,
+    "mlNotebooksOnly": false,
+    "sdkRoleAppOnly": true,
+    "exceptionalSlope": true,
+    "expected": "reject",
+    "note": "Exceptional-slope SDK exception, bounded: exceptionalSlope=true is only an escape hatch on rule 5 (sdkRoleAppOnly && !exceptionalSlope) — it does not rescue a candidate with zero signal elsewhere. Rule 3 (no artifact AND no fraud-depth) fires first and rejects before rule 5 is ever consulted. Contrast with fixture-G, which has hasArtifactLink=true so rule 3 never fires and the exception can actually produce 'dig'."
+  },
+  {
+    "id": "fixture-J",
+    "name": "Test Candidate J",
+    "email": "j@example.test",
+    "role": "ml",
+    "hasArtifactLink": true,
+    "artifactSubstantive": true,
+    "fraudDepth": null,
+    "mlNotebooksOnly": false,
+    "sdkRoleAppOnly": false,
+    "exceptionalSlope": false,
+    "expected": "advance",
+    "note": "ML notebooks-only vs. real pipeline work: this ML candidate's artifact is a real, substantive pipeline (mlNotebooksOnly=false), not Jupyter-notebooks-only — rule 1 fires normally same as any other role. Contrast with fixture-D (same role, notebooks-only, rule 4 rejects) to prove the ML rule only bites the notebooks-only case, not ML work generally."
+  },
+  {
+    "id": "fixture-K",
+    "name": "Test Candidate K",
+    "email": "k@example.test",
+    "role": "security",
+    "hasArtifactLink": true,
+    "artifactSubstantive": false,
+    "fraudDepth": "strong",
+    "mlNotebooksOnly": true,
+    "sdkRoleAppOnly": true,
+    "exceptionalSlope": false,
+    "expected": "advance",
+    "note": "Strong Q4 fraud-depth with co-occurring reject signals: mlNotebooksOnly and sdkRoleAppOnly are both true (each independently reject-triggering per rules 4/5), but fraudDepth='strong' fires rule 2 first — proves a strong fraud-domain identity signal is evaluated before, and isn't blocked by, unrelated auto-reject flags."
   }
 ]

@@ -19,6 +19,9 @@ We adopt [yc-software/qm](https://github.com/yc-software/qm) (MIT) as the harnes
 | `CLAUDE.md` | Operating manual for the builder agent (you, if you're an agent reading this) |
 | `BOOTSTRAP_PROMPT.md` | The prompt a human pastes into a Claude cloud agent to build + maintain this, 24×7 |
 | `docs/` | PRDs (master + recruiting), ADRs, deploy runbook |
+| `docs/gates.md` | Living human-gate ledger: 13 gates (G1–G13), each with accountable owner and unblock checklist |
+| `platform/contracts/` | Integration contracts for Notion, Gmail, Calendar, Slack — consumed by skills; `_template.md` for new connectors |
+| `platform/scripts/` | Deployment automation: bootstrap-qm.sh (preflight + provisioning), verify-deployment.md (checklist) |
 | `platform/deploy-layer/otpless/` | Everything org-specific for the qm deployment (config, command policy, sandbox additions) |
 | `packs/shared/` | Generic agent-infrastructure skill pack: identity, standup, retro, trust ladder — every agent imports this |
 | `packs/recruiting/` | Department #1, agent #1: full hiring loop skills + per-role job playbooks (generic `_template.md` — any future role is one file) |
@@ -38,6 +41,7 @@ We adopt [yc-software/qm](https://github.com/yc-software/qm) (MIT) as the harnes
 - [x] Skill packs v1 (shared + recruiting), 7 role playbooks + generic template
 - [x] Company brain seed
 - [x] Eval harness v1 (structure, template lint, rating fixtures)
-- [ ] qm deployment live (needs credentials — RUNBOOK step 1)
+- [x] Deployment-ready: contracts, scopes/crons as data, gate ledger, bootstrap preflight, evals x8
+- [ ] qm deployment live — blocked on gates G1–G9 (see `docs/gates.md`)
 - [ ] Recruiter agent on qm, trust ladder L0 → L1
 - [ ] Onboarder + People-Ops agents (P2)

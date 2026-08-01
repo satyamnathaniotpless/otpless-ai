@@ -42,9 +42,9 @@ After `create_draft`/`update_draft`, call `list_drafts` or `get_thread` to confi
 
 ## Capability gaps today
 
-**No send tool.** The available Gmail MCP operations are draft/label/read only — there is no `send` operation. Every "approved send" in the PRD (§6, §8) therefore still requires a human to actually send the drafted message (or the MCP must be extended with an approval-gated send tool before any action-class can reach L1/L2 for sends). This is the single largest gap between the PRD's stated capability and what's available today — flag for extension, not a workaround.
+**No send tool.** The available Gmail MCP operations are draft/label/read only — there is no `send` operation. Every "approved send" in the PRD (§6, §8) therefore still requires a human to actually send the drafted message (or the MCP must be extended with an approval-gated send tool before any action-class can reach L1/L2 for sends). This is the single largest gap between the PRD's stated capability and what's available today — flag for extension, not a workaround. Tracked as gate G13, `docs/gates.md`, owner CTO (ADR-007: the send capability is verified/extended at deploy time, never worked around).
 
 ## Credentials required
 
-- OAuth token for the recruiting agent's own mailbox (`recruiting@otpless.com`) — provided by: Satyam (Google Workspace admin).
-- SPF/DKIM DNS records for the mailbox — provided by: Satyam (DNS access) — human gate per CLAUDE.md.
+- OAuth token for the recruiting agent's own mailbox (`recruiting@otpless.com`) — provided by: CTO (Google Workspace admin) — gate G5, `docs/gates.md`.
+- SPF/DKIM DNS records for the mailbox — provided by: CTO (DNS access) — gate G5, human gate per CLAUDE.md.

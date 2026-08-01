@@ -45,6 +45,8 @@ After `slack_send_message`/`slack_schedule_message` fires (i.e. once an action-c
 
 No reaction-read tool — the PRD's "👍-to-act" pattern (F2) implies detecting an operator's emoji reaction as an approval signal, but no available tool reads message reactions, only message/thread text. Until the MCP is extended with a reactions read, "👍-to-act" cannot be detected programmatically; the agent must fall back to reading an explicit reply instead.
 
+**Deprecated server package.** `.mcp.json` currently pins Slack to `@modelcontextprotocol/server-slack`, which npm reports as deprecated/no longer supported. The concrete package must be confirmed (or replaced) when the deployment is actually wired — do not assume it works as-is. Tracked as gate G12, `docs/gates.md`, owner CTO.
+
 ## Credentials required
 
-- Slack bot token for the recruiting agent's own bot identity, scoped to `#hiring` (and `#people`) — provided by: Satyam (Slack workspace admin, app install/OAuth).
+- Slack bot token for the recruiting agent's own bot identity, scoped to `#hiring` (and `#people`) — provided by: CTO (Slack workspace admin, app install/OAuth) — gate G6, `docs/gates.md`.

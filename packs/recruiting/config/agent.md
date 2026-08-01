@@ -31,15 +31,9 @@ See `packs/recruiting/config/goals.md` for the full scoreboard (owned numbers, r
 
 Level changes only via a merged PR against `platform/deploy-layer/otpless/command-policy.md`, never edited here directly as a shortcut.
 
-| Action-class | Current level | Evidence window | Last incident | Notes |
-|---|---|---|---|---|
-| Scheduling confirmations | L0 | — | — | Candidate for L1 once 2 weeks of unedited-send data exists (PRD §12.3) |
-| Application acknowledgments | L0 | — | — | Candidate for L1 once 2 weeks of unedited-send data exists |
-| Follow-up nudges (3d/7d silence) | L0 | — | — | Candidate for L1 once 2 weeks of unedited-send data exists |
-| Outreach (new) | L0 | — | — | Never above L0 without a human review step per playbook |
-| Applied-stage rejection | L0 | — | — | Candidate for L2 per trust-ladder, not before 4-week clean window (P3, PRD §12.3) |
-| Auto-advance stage per playbook rule | L0 | — | — | Candidate for L2 per trust-ladder, not before 4-week clean window (P3) |
-| Offers / comp discussion / post-interview rejections / policy changes | NEVER DELEGATED | n/a | n/a | Hard-coded deny in command policy regardless of any row above (PRD §12.3) |
+Authoritative action-class list and current trust levels: `platform/deploy-layer/otpless/scopes/recruiter.md` § "Action-classes with current trust level" — command policy compiles from the deploy layer, so that table is the source of truth. Do not maintain a second, divergent copy here.
+
+Never-delegated (hard deny, every posture/level, all scopes — full six-class list, not a partial copy): `platform/deploy-layer/otpless/command-policy.md` §4 — offers, compensation, terminations, performance judgments, post-interview rejections, policy changes.
 
 ## Standup / retro cadence
 

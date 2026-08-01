@@ -12,6 +12,8 @@ Skills consume contracts, never APIs directly, so that:
 
 MCP servers are declared in `.mcp.json` at repo root. Every credential referenced there is an env var name only (e.g. `${NOTION_TOKEN}`) — actual values live in qm's keychain, scoped per agent, never in git.
 
+**Warning:** the packages pinned in `.mcp.json` are unverified until the deployment is actually wired — in particular, the Slack server (`@modelcontextprotocol/server-slack`) is npm-flagged deprecated. Confirm or replace each package at deploy time (gate G12, `docs/gates.md`).
+
 ## Index
 
 | Contract | System | Consumed by |

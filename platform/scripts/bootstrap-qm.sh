@@ -47,6 +47,9 @@ done
 # We print PASS/MISSING for each; we never print the variable's value.
 # ---------------------------------------------------------------------------
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ORG_CONFIG_PATH="${SCRIPT_DIR}/../deploy-layer/otpless/org-config.md"
+
 ALL_PASS=1
 declare -a ROWS=()
 
@@ -92,6 +95,27 @@ check_gh_auth() {
   fi
 }
 
+check_g8() {
+  # G8 passes on EITHER the AGENT_PUBLIC_NAME env var OR a filled-in
+  # "Agent public name" row (no longer containing TODO(gate)) in org-config.md.
+  # docs/gates.md "How to close a gate" documents both routes as equally valid.
+  local gate="G8" desc="Agent public name (founder-decided)"
+  if [ -n "${AGENT_PUBLIC_NAME:-}" ]; then
+    ROWS+=("$gate|$desc|PASS|(source: AGENT_PUBLIC_NAME env var)")
+    return
+  fi
+  if [ -f "$ORG_CONFIG_PATH" ]; then
+    local line
+    line=$(grep -m1 "Agent public name" "$ORG_CONFIG_PATH" || true)
+    if [ -n "$line" ] && ! grep -q "TODO(gate)" <<<"$line"; then
+      ROWS+=("$gate|$desc|PASS|(source: org-config.md 'Agent public name' row)")
+      return
+    fi
+  fi
+  ALL_PASS=0
+  ROWS+=("$gate|$desc|MISSING|AGENT_PUBLIC_NAME env var, or org-config.md 'Agent public name' row still has TODO(gate)")
+}
+
 # G1 — Cloud account: Fly.io org (or AWS)
 check_env "G1" "Fly.io org + API token" FLY_ORG FLY_API_TOKEN
 
@@ -105,8 +129,11 @@ check_env "G3" "Anthropic API key" ANTHROPIC_API_KEY
 check_cli "G4a" "gh CLI installed" gh
 check_gh_auth "G4b" "gh CLI authenticated"
 
-# G5 — Google Workspace OAuth client for Gmail/Calendar
-check_env "G5" "Google OAuth client (Gmail/Calendar)" GOOGLE_OAUTH_CLIENT_ID GOOGLE_OAUTH_CLIENT_SECRET
+# G5 — Google Workspace OAuth client for Gmail/Calendar. Split into two legible
+# sub-checks (both map to gate G5 in docs/gates.md) since the gmail and
+# google-calendar MCP servers in .mcp.json each require their own three-var set.
+check_env "G5a" "Gmail OAuth (gate G5)" GMAIL_OAUTH_CLIENT_ID GMAIL_OAUTH_CLIENT_SECRET GMAIL_OAUTH_REFRESH_TOKEN
+check_env "G5b" "Calendar OAuth (gate G5)" GOOGLE_OAUTH_CLIENT_ID GOOGLE_OAUTH_CLIENT_SECRET GOOGLE_OAUTH_REFRESH_TOKEN
 
 # G6 — Slack app bot token
 check_env "G6" "Slack bot token" SLACK_BOT_TOKEN
@@ -114,8 +141,8 @@ check_env "G6" "Slack bot token" SLACK_BOT_TOKEN
 # G7 — Notion internal integration token
 check_env "G7" "Notion integration token" NOTION_TOKEN
 
-# G8 — Agent public-name decision (not a credential; a config value the founder sets)
-check_env "G8" "Agent public name (founder-decided)" AGENT_PUBLIC_NAME
+# G8 — Agent public-name decision (not a credential; env var OR org-config.md row)
+check_g8
 
 # G9 — Web sign-in broker: Resend API key or SMTP creds
 if [ -n "${RESEND_API_KEY:-}" ]; then

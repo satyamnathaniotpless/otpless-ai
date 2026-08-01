@@ -48,4 +48,4 @@ No push/subscribe mechanism — "new applicant → Slack within minutes, any hou
 
 ## Credentials required
 
-- Notion integration token for the recruiting agent's own machine user (never a human's), scoped to the Applicants data source and Careers page — provided by: Satyam (Notion workspace admin, OAuth/integration grant).
+- Notion integration token for the recruiting agent's own machine user (never a human's), scoped to the Applicants data source and Careers page — provided by: Founder (Notion workspace admin, OAuth/integration grant) — gate G7, `docs/gates.md`.

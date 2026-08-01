@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.2.0 — 2026-08-01 · P0 deployment-ready
+- Build team: 7 subagent roles (architect, builder, reviewer, evaluator, integrator, librarian, deployer) in `agents/`, generated to `.claude/agents/`.
+- `platform/contracts/` — integration contracts for Notion, Gmail, Calendar, Slack + `_template.md`.
+- `platform/deploy-layer/otpless/scopes/` — scope definitions as data files; `packs/recruiting/config/` — agent config and goals files.
+- Cron table in `platform/deploy-layer/otpless/crons.md` — scheduled work (new-applicant watch, SLA sweep, 08:30 IST digest + standup, weekly retro).
+- `docs/gates.md` — unified human-gate ledger (13 gates, G1–G13, each with one accountable owner).
+- `platform/scripts/bootstrap-qm.sh` (preflight-only by default) + verify-deployment.md.
+- Eval harness: 8 check groups (structure, skill-shape, generic disclosure/draft lint, never-delegated coverage, gate hygiene, secret-shape guard, cross-reference, ratings). GREEN, 0 failures.
+- ADR-006 & ADR-007 — approval gate (not Slack reactions), draft as contract boundary.
+
 ## v0.1.0 — 2026-08-01 · Commissioning build
 - Platform docs: README, CLAUDE.md (operating manual), BOOTSTRAP_PROMPT (build + maintain prompts), PRDs, ADR-001..005, deploy runbook.
 - packs/shared v1: identity, standup, retro, trust-ladder skills + agent config template.

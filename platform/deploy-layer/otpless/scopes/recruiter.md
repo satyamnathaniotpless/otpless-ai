@@ -8,7 +8,7 @@
 
 ## Agent identity config pointer
 
-`packs/recruiting/config/agent.md` — TODO(gate): agent public name, who: Satyam (founder-approved per PRD §11 open question 2; never picked unilaterally). Filled from `packs/shared/config/agent.md.example`; mailbox/Slack handle/interviewer list from `packs/recruiting/config/user.md` (gitignored, template at `user.md.example`).
+`packs/recruiting/config/agent.md` — TODO(gate): agent public name, who: Founder (gate G8, `docs/gates.md`; per PRD §11 open question 6 — never picked unilaterally). Filled from `packs/shared/config/agent.md.example`; mailbox/Slack handle/interviewer list from `packs/recruiting/config/user.md` (gitignored, template at `user.md.example`).
 
 ## Packs imported
 
@@ -53,7 +53,7 @@ See `crons.md` for full schedule detail.
 
 ## Accountable human
 
-Satyam, Founder — owns Founding Recruiter/Security/ML pipelines and all offers/comp/closes (`packs/recruiting/config/user.md`).
+Founder — owns Founding Recruiter/Security/ML pipelines and all offers/comp/closes (`packs/recruiting/config/user.md`).
 
 ## Memory / knowledge sources
 
@@ -65,9 +65,9 @@ Satyam, Founder — owns Founding Recruiter/Security/ML pipelines and all offers
 
 ## Gates outstanding
 
-- TODO(gate): agent public name approval — who: Satyam
-- TODO(gate): Notion integration token/grant for the recruiting machine user — who: Satyam
-- TODO(gate): Gmail OAuth + SPF/DKIM DNS for `recruiting@otpless.com` — who: Satyam
-- TODO(gate): Google Calendar OAuth for the agent's own calendar — who: Satyam
-- TODO(gate): Slack bot token/app install scoped to `#hiring`/`#people` — who: Satyam
-- TODO(gate): Gmail MCP send capability — currently draft/label/read only (see `platform/contracts/gmail.md` capability gap); extending the MCP, not a workaround, is the fix — who: platform team, approved by Satyam before any send action-class can promote past L0
+- TODO(gate): agent public name approval — who: Founder (gate G8, `docs/gates.md`)
+- TODO(gate): Notion integration token/grant for the recruiting machine user — who: Founder (gate G7, `docs/gates.md`)
+- TODO(gate): Gmail OAuth + SPF/DKIM DNS for `recruiting@otpless.com` — who: CTO (gate G5, `docs/gates.md`)
+- TODO(gate): Google Calendar OAuth for the agent's own calendar — who: CTO (gate G5, `docs/gates.md`)
+- TODO(gate): Slack bot token/app install scoped to `#hiring`/`#people` — who: CTO (gate G6, `docs/gates.md`)
+- TODO(gate): Gmail MCP send capability — currently draft/label/read only (see `platform/contracts/gmail.md` capability gap, ADR-007); extending the MCP, not a workaround, is the fix — gate G13, `docs/gates.md`, owner CTO, before any send action-class can promote past L0

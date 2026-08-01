@@ -15,7 +15,7 @@ description: |
 ## Inputs
 
 - `../config/user.md` (default block: Tue/Thu 5-7pm IST, meet link, office address)
-- `../config/playbook.md` (calendar templates, responseStatus rules)
+- `../config/playbook.md` (calendar templates, responseStatus rules, disclosure signature)
 - Calendar (fresh), Gmail thread, Notion Applicants row
 
 ## Process
@@ -25,7 +25,7 @@ description: |
 3. Batch candidates back-to-back within the block: 15-min intro calls, 60-min technical/work-sample debriefs.
 4. Create events using the templates in `../config/playbook.md`. **Candidate-facing titles are always `{First name} × {operator first name}` — never "interview" or "screen" anywhere in the title or visible description.**
 5. Include the meet link (and office address for onsite) from `../config/user.md`.
-6. Draft the confirmation reply in-thread using the standard prompt:
+6. Draft the confirmation reply in-thread. It is candidate-facing, so it carries the AI-disclosure signature from `../config/playbook.md` verbatim — a scheduling mail is not exempt (`packs/shared/identity/SKILL.md`). Use the standard prompt:
 ```
 d) draft   s) send   e) edit — tell me what to change   ?) something else
 ```

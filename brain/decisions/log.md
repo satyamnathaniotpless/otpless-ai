@@ -11,4 +11,10 @@ Append new decisions to the bottom. One line each: date, decision, one-line why.
 | 2026-08-01 | ADR-003: Company brain — git canonical, Notion mirror | `brain/` in git is the source of truth for agent-readable knowledge; Notion is a synced, human-friendly mirror, never hand-edited as canon. |
 | 2026-08-01 | ADR-004: Trust ladder enforced by policy, not convention | Autonomy levels (L0→L1→L2) are encoded in qm's command policy and per-scope posture, not left to prompt discipline; promotions/demotions are config changes with evidence. |
 | 2026-08-01 | ADR-005: Generic by construction | Role/department-specific content is always data (config instantiated from `_template.md`), never process (skills) — marginal cost of a new role/department/agent trends to zero. |
+| 2026-08-01 | ADR-006: Human approval is recorded by qm's approval gate, not Slack reactions | Slack is a notification surface, not an authorization surface; the MCP cannot read reactions and approvals must be attributable, versioned, and replayable. |
+| 2026-08-01 | ADR-007: The draft is the universal contract boundary | Every skill's output ends at a created draft in every channel, at every trust level; send capability is verified at deploy time, never worked around. |
+| 2026-08-01 | Integration contracts live at `platform/contracts/`, consumed by skills | Stops each new department re-deriving another team's schema. |
+| 2026-08-01 | Scopes, crons, and contracts are data files with `_template.md` siblings | ADR-005 applied: a new agent, schedule, or connector integration is one file or one row. |
+| 2026-08-01 | `docs/gates.md` is the single ledger for human gates | One accountable human per gate, no gate rediscovered per phase. |
+| 2026-08-01 | Web sign-in default (gate G9): qm's built-in auth broker with Resend as sender; external IdP requires an ADR | The fastest path is the default; any diversion documented upfront. |
 - 2026-08-01 · **Hosting: Fly.io** for the qm deployment (binding per deployment directory; AWS would require a fresh init). Decided by founder.

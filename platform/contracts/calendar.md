@@ -22,7 +22,7 @@ Availability, event creation, and confirmation state for candidate scheduling (P
 
 ## Field & name mapping
 
-Candidate-facing titles never contain "interview"/"screen" — use "{Name} × Satyam" (PRD §6). Timezone Asia/Kolkata always. Meet link, office address, and default scheduling blocks live in `user.md`. Interviewer list (name/email/role) also in `user.md`.
+Candidate-facing titles never contain "interview"/"screen" — use the title template `{Candidate Name} × {Operator Name}` (PRD §6), where the operator name is pulled from the Operators table in `packs/recruiting/config/user.md`, never hardcoded here (ADR-005: the rule lives in the contract, the value lives in config). Timezone Asia/Kolkata always. Meet link, office address, and default scheduling blocks live in `user.md`. Interviewer list (name/email/role) also in `user.md`.
 
 ## Staleness & re-query semantics
 
@@ -49,4 +49,4 @@ No way to generate or verify a live video-conferencing link through this MCP —
 
 ## Credentials required
 
-- OAuth token for the recruiting agent's own calendar (`recruiting@otpless.com`) — provided by: Satyam (Google Workspace admin).
+- OAuth token for the recruiting agent's own calendar (`recruiting@otpless.com`) — provided by: CTO (Google Workspace admin) — gate G5, `docs/gates.md`.
