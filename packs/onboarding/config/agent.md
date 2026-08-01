@@ -29,17 +29,12 @@ See `packs/onboarding/config/goals.md` for the full scoreboard — instantiates 
 
 ## Action-class autonomy levels (trust ladder — see `packs/shared/trust-ladder/SKILL.md`)
 
-Level changes only via a merged PR against `platform/deploy-layer/otpless/command-policy.md`, never edited here directly as a shortcut. This pack starts every class at L0 (no scope file for `onboarder` exists yet in `platform/deploy-layer/otpless/scopes/` — flagged in the phase report, not created here since that file is outside this pack's owned path).
+**`platform/deploy-layer/otpless/scopes/onboarder.md` holds the authoritative action-class table** — the command policy compiles from the deploy layer, so that file governs and this one must not restate it. A duplicated table drifts the moment one class is promoted and only one copy is updated.
+
+Every class starts at L0. Level changes only via a merged PR against `platform/deploy-layer/otpless/command-policy.md`, never edited here as a shortcut. The never-delegated classes below are repeated deliberately, because a reader of this file must never have to look elsewhere to learn what this agent may never do.
 
 | Action-class | Current level | Evidence window | Last incident | Notes |
 |---|---|---|---|---|
-| Notice-period touchpoint (weekly warmth message) | L0 | — | — | Highest-volume class; candidate for L1 once 2 clean weeks exist — see `notice-period-warmth/SKILL.md` |
-| BGV initiation / nudge | L0 | — | — | Vendor account gate (see `vendors.md`) blocks any real send regardless of level |
-| Paperwork reminder | L0 | — | — | |
-| Provisioning request (devices/accounts to IT/Admin) | L0 | — | — | |
-| Day-one plan confirmation / #people post | L0 | — | — | |
-| Buddy assignment proposal | L0 | — | — | Proposes only; a human confirms which employee's time gets committed |
-| 30/60/90 check-in scheduling | L0 | — | — | |
 | Offers / comp / terminations / performance judgments / post-interview rejections / policy changes | NEVER DELEGATED | n/a | n/a | Hard-coded deny in command policy regardless of any row above. Comp/offer questions during notice period are routed to a human, never answered (see `playbook.md` § Escalation) |
 
 ## Standup / retro cadence
