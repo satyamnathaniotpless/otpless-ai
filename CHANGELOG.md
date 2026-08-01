@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.0.0 — 2026-08-01 · P4 template out · roadmap complete
+- Build roadmap complete; platform enters maintenance mode. Deployment remains gated (gates G1–G9, G14–G25 open); no agent has run against a real person.
+- `docs/DEPARTMENT_AUTOMATION_PLAYBOOK.md` — the executable playbook for standing up department #2 and every department after: the model (process = code, everything specific = data), the six actual failure modes hit during P0–P3 with the lesson from each, build sequence, what `packs/shared` gives free, guardrail patterns that worked, parallel-build coordination (fresh-context review is not optional), and department #2 recommendation (support is the structural fit; founder decides).
+- `docs/RUNBOOK_MAINTENANCE.md` — standing operating procedure once the roadmap ships: eval watch, qm health, per-agent retro, evidence review, upstream merge, gate ledger, new proposals, brain currency. Most duties are inert until deployment is live.
+- `docs/proposals/_template.md` — one-page brief format for proposing a new agent/department, requiring evidence of observed repeated manual work (not ideas).
+- Decisions: department #2 recommendation (support), new proposals require observed work (not ideas), fresh-context review is the cost of parallelism, never optional. ADR-005 validated by five agents; one metric owner per fact (recruiter cites, analyst computes); scope slugs canonical.
+- Evals: 12 check groups, 0 failures. Build roadmap delivered and evaluated; operator manual written.
+
 ## v0.5.0 — 2026-08-01 · P3 department complete
 - Analyst + Culture & Growth packs (7 + 7 skills): attrition signals, comp drift, engagement drilldown, survey analysis; review tracking, 1:1 cadence, offboarding checklist, culture pulse survey cycle, team-tenure heatmap, culture changelog, peer-review aggregation.
 - WhatsApp integration contract (`platform/contracts/whatsapp.md`): capability shape, template approval gate (G21), sender-identity decision (G22), in-draft mode at all trust levels pending MCP build.

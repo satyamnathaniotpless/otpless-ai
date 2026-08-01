@@ -53,4 +53,4 @@ We adopt [yc-software/qm](https://github.com/yc-software/qm) (MIT) as the harnes
 - [x] Analyst + Culture & Growth packs built, WhatsApp contract (not live — gates G1–G9, G14–G25)
 - [ ] qm deployment live — blocked on gates G1–G9 (see `docs/gates.md`)
 - [ ] Recruiter agent on qm, trust ladder L0 → L1
-- [ ] Department automation playbook (template out to department #2)
+- [x] Department automation playbook (`docs/DEPARTMENT_AUTOMATION_PLAYBOOK.md`) — template out to department #2, recommendation: support
