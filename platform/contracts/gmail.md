@@ -40,6 +40,12 @@ After `create_draft`/`update_draft`, call `list_drafts` or `get_thread` to confi
 | Permission-denied | Halt, escalate as a mailbox/OAuth grant issue — never fall back to another mailbox |
 | Ambiguous result (multiple threads matching a candidate) | Surface all matches to the operator; never guess which thread to reply in |
 
+## PII handling
+
+A candidate email thread can contain anything a candidate chose to volunteer — health or accommodation needs, personal circumstances behind a gap or a notice-period ask, family or immigration details — none of it solicited by this platform, all of it real PII the moment it's read. Thread content is also, structurally, the least contained thing this platform touches: a full back-and-forth, not a single field.
+
+**Thread bodies never enter git, never enter Slack (not a channel post, not a DM, not a digest), and never enter a fixture** — fixtures for this contract are synthetic threads only, never a captured real one. A skill may reference that a thread exists and its high-level status (`packs/shared/identity/SKILL.md` §8 — name + one factual one-liner: "awaiting reply," "scheduling in progress") but never quotes, paraphrases, or forwards thread content into Slack or a Notion note beyond the fields `notion.md` already defines. Anything a candidate volunteers that reads as a sensitive disclosure (health, disability accommodation, immigration status) is never summarized or acted on by the skill — draft the reply as usual, but flag the disclosure to the accountable human rather than the agent deciding how to handle it.
+
 ## Capability gaps today
 
 **No send tool.** The available Gmail MCP operations are draft/label/read only — there is no `send` operation. Every "approved send" in the PRD (§6, §8) therefore still requires a human to actually send the drafted message (or the MCP must be extended with an approval-gated send tool before any action-class can reach L1/L2 for sends). This is the single largest gap between the PRD's stated capability and what's available today — flag for extension, not a workaround. Tracked as gate G13, `docs/gates.md`, owner CTO (ADR-007: the send capability is verified/extended at deploy time, never worked around).

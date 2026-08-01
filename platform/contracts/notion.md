@@ -42,6 +42,12 @@ Per `packs/recruiting/config/notion.md` query conventions: after every write, re
 | Permission-denied (machine user lacks access to the data source) | Halt, escalate to the accountable human as a credential/grant issue — do not proceed on partial access |
 | Ambiguous result (duplicate/near-duplicate candidate rows) | Present both rows to the operator; never guess which is authoritative or write to either |
 
+## PII handling
+
+The Applicants DB carries a candidate's Q1–Q4 screening answers, notice period, comp expectation, and the Builder/OSS/Fraud flags this contract's skills write (see "What we write"). Candidate PII is handled with real care but less strictly than employee PII (master PRD §6) — that does not make it Slack-safe or git-safe.
+
+A flag — Fraud, Builder, or OSS — is a judgment recorded about a named person, not a routine status field: it is exactly the kind of content that never appears in Slack beyond name + one factual one-liner (`packs/shared/identity/SKILL.md` §8). "Flagged for review" is acceptable phrasing in a digest; the flag's name, the reasoning behind it, or the underlying application text is not. The same restriction covers notice period and comp expectation — real figures a candidate gave in confidence — and the full Q1–Q4 answer text: none of it is restated in Slack beyond the one-liner, none of it enters git or a fixture (fixtures use synthetic candidates only). A Fraud flag specifically is never actioned or communicated to the candidate by any skill — it routes to the accountable human as a judgment call, the same posture `bgv.md` requires for an adverse BGV result.
+
 ## Capability gaps today
 
 No push/subscribe mechanism — "new applicant → Slack within minutes, any hour" (F9) can only be achieved by polling `notion-query-data-sources` on a tight cron; latency is bounded by cron cadence, not a real-time event. See `crons.md` for the polling interval chosen to approximate this.

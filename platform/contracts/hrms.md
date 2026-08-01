@@ -15,7 +15,7 @@ HRMS — the commercial system of record for payroll, leave, attendance, and com
 
 ## What we write
 
-**None.** This is the absolute rule this contract exists to state, not a default that erodes under a busy week. What master PRD §4 calls "payroll cycle coordination (inputs to Keka/RazorpayX by cutoff dates)" is a **drafted input packet** — e.g. a Slack/Notion note listing new joiners, leavers, and leave-balance deltas — handed to the accountable human, who keys it into the HRMS's own input flow themselves. No skill calls an HRMS write/update/create endpoint, even if the eventually-chosen vendor's API exposes one, even once an action-class reaches L1/L2. Trust-ladder promotion for a "payroll input packet" action-class only ever promotes how fast the drafted packet reaches the human — never whether the write is agent-executed. A future HRMS-write action-class would be a distinct, newly-authored action-class requiring its own ADR and `command-policy.md` row; it does not inherit any evidence accumulated by the read-only classes above.
+**None.** This is the absolute rule this contract exists to state, not a default that erodes under a busy week. What master PRD §4 calls "payroll cycle coordination (inputs to Keka/RazorpayX by cutoff dates)" is a **drafted input packet** listing new joiners, leavers, and leave-balance deltas, delivered privately to the accountable human — email or an access-controlled document — who keys it into the HRMS's own input flow themselves. It is never posted to a Slack channel or DM: the packet carries per-employee compensation-adjacent detail, and a Slack surface (including a cron digest) gets counts and urgency only, never a name attached to a payroll change and never a figure (master PRD §6 Slack minimization; `packs/people-ops/payroll-prep/SKILL.md`). No skill calls an HRMS write/update/create endpoint, even if the eventually-chosen vendor's API exposes one, even once an action-class reaches L1/L2. Trust-ladder promotion for a "payroll input packet" action-class only ever promotes how fast the drafted packet reaches the human — never whether the write is agent-executed. A future HRMS-write action-class would be a distinct, newly-authored action-class requiring its own ADR and `command-policy.md` row; it does not inherit any evidence accumulated by the read-only classes above.
 
 ## Field & name mapping
 
@@ -40,6 +40,14 @@ Not applicable — this contract authorizes no writes (see "What we write" above
 | Permission-denied | Halt, escalate to the accountable human as a credential/grant issue |
 | Ambiguous result (e.g. two employee records matching a name) | Present both to the accountable human; never guess which is authoritative, never average or merge their values |
 | Connector not yet wired (pre-gate) | Every read in this contract degrades to "HRMS: not yet connected" — a distinct state from post-gate-unavailable, never rendered as "found nothing" |
+
+## PII handling
+
+HRMS carries the most consequential employee-financial data this platform reads: leave balances, attendance/punch records, loss-of-pay calculations, exit dates, and the payroll inputs derived from them. This is employee data, and employee PII is handled stricter than candidate PII everywhere on this platform (master PRD §6, DPDP) — nothing here inherits the looser candidate-data handling used in `notion.md` / `gmail.md`.
+
+The channel rule already stated narrowly for the payroll packet in "What we write" is the general rule for every HRMS-derived fact: **a Slack surface — a channel post, a DM, or a cron digest — gets counts and urgency only, never a field value.** "3 leave requests pending this week" is fine; "{name}'s leave balance is -2 days" or "{name}'s LOP this cycle is ₹X" is not, on any channel, at any trust level, including a 1:1 DM to the accountable human — a DM is retained, exportable, and admin-readable, not a private line (`slack.md`). The one place a named figure is allowed to travel is the drafted payroll input packet itself, delivered privately (email or an access-controlled document) to the accountable human, exactly as "What we write" already describes.
+
+No HRMS-sourced field value — a balance, a punch, an LOP amount, an exit date — ever enters git, a fixture, or a retro note; fixtures for this contract use synthetic employees only, never a real leave/attendance record. No skill stores or restates a leave/attendance/LOP value beyond the single read needed to answer the question in front of it that turn. An exit date or an LOP dispute is never an agent's judgment to resolve or explain to the employee — it routes to the accountable human, the same as every other HRMS interaction (see "What we write").
 
 ## Capability gaps today
 

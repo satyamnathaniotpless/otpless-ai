@@ -43,6 +43,12 @@ After `create_event`/`update_event`, call `get_event` (or `list_events`) to re-f
 | Permission-denied | Halt, escalate as a Calendar grant issue |
 | Ambiguous result (`suggest_time` returns multiple equally-valid slots, or multiple events match a search) | Present all options to the operator; never auto-pick |
 
+## PII handling
+
+An event's attendee list is itself PII: it reveals which candidate is interviewing, with which interviewers, at what stage — and, for internal calendars, an interviewer's schedule and workload. An invite is visible to every party on it: the candidate sees who else is listed, and every interviewer sees the candidate's name and email — there is no private field on a calendar invite the way there is on a Notion property.
+
+This is why the title rule in "Field & name mapping" is a PII control, not a style preference: a candidate-visible title never contains "interview"/"screen" or any other word that outs the process to someone who sees the candidate's calendar over their shoulder (current employer, family). Attendee lists, event descriptions, and titles never enter Slack beyond what F5/F8 already report — name + stage-status one-liner, per `packs/shared/identity/SKILL.md` §8 — never the full attendee list, never an interviewer's other bookings. None of it enters git or a fixture; fixtures use synthetic candidates and interviewers. Cancelling or rescheduling a candidate-facing event is already gated as an external-visible action (`command-policy.md` §2, see "What we write") in part for this reason — a change to who's on an invite is a change to who knows what about whom.
+
 ## Capability gaps today
 
 No way to generate or verify a live video-conferencing link through this MCP — the meet link is a static value pulled from `user.md` config, not created per-event. If per-event unique links are ever required, that's an MCP extension, not a config workaround.

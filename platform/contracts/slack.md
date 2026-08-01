@@ -41,6 +41,12 @@ After `slack_send_message`/`slack_schedule_message` fires (i.e. once an action-c
 | Permission-denied (bot missing from channel/scope) | Halt, escalate as a Slack app/scope grant issue |
 | Ambiguous result (`slack_search_users` returns multiple name matches) | Surface all matches to the operator; never guess which person |
 
+## PII handling
+
+Slack is the surface every other contract in this index restricts against, not a system with its own PII store — so this section is the canonical statement the others point back to. Every message posted to a human — channel post, DM, canvas, or scheduled digest — that references a specific candidate or employee carries **at most a name plus one factual one-liner** (role applied for / current stage / lifecycle checkpoint), per `packs/shared/identity/SKILL.md` §8. It never carries a field value from a source system: no comp figure, no ESOP number, no leave balance, no LOP amount, no BGV/documents-status detail, no phone number, no government ID, no health information, no full application or thread text, no attachment or document. If a message would need any of those to make sense, the message is wrong, not the rule — shorten it to the one-liner and point the reader to the system of record instead.
+
+**A DM is not a private channel.** It is retained, exportable by a workspace admin, and held to the same minimization rule as a public post in `#hiring` or `#people` — nothing is said in a DM that wouldn't be said in the open channel. The same applies to a cron digest: aggregate counts and urgency ("3 leave requests pending," "1 candidate flagged for review") are fine; a named figure or a named flag is not, regardless of how the digest is delivered.
+
 ## Capability gaps today
 
 No reaction-read tool — the PRD's "👍-to-act" pattern (F2) implies detecting an operator's emoji reaction as an approval signal, but no available tool reads message reactions, only message/thread text. Until the MCP is extended with a reactions read, "👍-to-act" cannot be detected programmatically; the agent must fall back to reading an explicit reply instead.

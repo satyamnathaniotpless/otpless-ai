@@ -6,7 +6,9 @@ This file does not itself contain any evidence — it points `packs/shared/metri
 
 ## Action-classes tracked
 
-Slugs match `platform/deploy-layer/otpless/command-policy.md` exactly. The authoritative per-action-class table for this scope lives in `platform/deploy-layer/otpless/scopes/people-ops.md` — the command policy compiles from the deploy layer, so that file governs and the rows below are a convenience read that must never be cited to justify a level it does not grant.
+The authoritative per-action-class table for this scope lives in `platform/deploy-layer/otpless/scopes/people-ops.md` — the command policy compiles from the deploy layer, so that file governs and the rows below are a convenience read that must never be cited to justify a level it does not grant.
+
+`platform/deploy-layer/otpless/command-policy.md` does not yet carry named per-action-class rows; it states the L0 floor, the gates, and the never-delegated denials in general terms, and the named rows are compiled in at deployment (gate G19). No promotion can cite a row that does not exist, so nothing here is promotable yet — the correct state, since the agent has not run.
 
 | Action-class | Rollup location | Minimum sample size | Current level | Notes |
 |---|---|---|---|---|

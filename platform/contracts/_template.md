@@ -37,6 +37,14 @@
 | Permission-denied | {behavior} |
 | Ambiguous result (e.g. multiple matches) | {behavior} |
 
+## PII handling
+
+{What personal data this system carries, and the handling rule that follows from it. Be specific about the worst case, not the average one — the field that would do real damage if it reached the wrong surface.
+
+State explicitly: what may appear in Slack (the default answer is a name plus a one-line status, never a field value — a DM is retained, exportable, and admin-readable, so it is not a private channel); what must never enter git; what is never stored or restated by an agent; and any class of result that must route to a human rather than become an agent decision.
+
+Delete this section only if the system genuinely carries no personal data. Most do. Employee data is handled stricter than candidate data (master PRD §6, DPDP).}
+
 ## Capability gaps today
 
 {What the MCP cannot do yet. Extending the MCP is the fix — never a curl bypass. List as a finding, not a workaround.}

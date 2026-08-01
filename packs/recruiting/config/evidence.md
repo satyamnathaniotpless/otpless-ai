@@ -6,7 +6,9 @@ Instantiates `packs/shared/config/evidence.md.example`. This file holds no evide
 
 ## Action-classes tracked
 
-Slugs match `platform/deploy-layer/otpless/command-policy.md` exactly — the ledger, the rollup, and the policy file must all name a class the same way, or the promotion citation chain breaks silently.
+**These slugs are the canonical vocabulary for this agent's action-classes, and `platform/deploy-layer/otpless/command-policy.md` does not yet carry per-action-class rows at all** — it currently states the L0 floor, the promotion gates, and the never-delegated denials in general terms (§2–§4), plus per-scope posture (§7). The named rows get compiled into it when the deployment is created, from the authoritative table in `platform/deploy-layer/otpless/scopes/recruiter.md`.
+
+Until that compilation happens, no promotion can cite a policy row that exists, so **no promotion can happen** — which is the correct state, since the system has not run and no evidence exists. Gate G19 tracks the compilation. The ledger, the rollup, and the policy file must all name a class the same way once it does; a silent mismatch is exactly the break ADR-008 exists to prevent.
 
 | Action-class | Rollup location | Minimum sample size | Current level | Notes |
 |---|---|---|---|---|
