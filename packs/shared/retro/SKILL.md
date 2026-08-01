@@ -14,11 +14,12 @@ Weekly, cron-fired, once per agent, after enough of the week's drafts have been 
 - Every draft the agent produced since the last retro cycle, and its resolution: sent unedited / sent with human edits (with the diff) / rejected / still pending.
 - Any explicit human override or correction captured elsewhere (e.g. a Slack correction, a rejected recommendation) since the last cycle.
 - The agent's current config/playbook files (what it's diffing edits *against*).
+- The weekly evidence rollup(s) for this agent (`platform/evidence/<agent-scope>/`, produced by `packs/shared/metrics/SKILL.md`) — counts only, no diffs, no names — read per action-class as a corroborating signal for where to look, never as a substitute for inspecting the actual diffs in step 1.
 
 ## Process
 
 1. **Diff every human-edited-vs-drafted message** since the last retro cycle. Categorize edits (tone, length, removed paragraph, added specific detail, factual correction, structural change, etc.).
-2. **Count occurrences per pattern.** A pattern is a repeated, categorizable edit — not a one-off. Examples: "operator removes the second paragraph," "operator always adds a specific number where I left a range," "operator shortens my subject lines."
+2. **Count occurrences per pattern.** A pattern is a repeated, categorizable edit — not a one-off. Examples: "operator removes the second paragraph," "operator always adds a specific number where I left a range," "operator shortens my subject lines." Use the rollup's per-action-class bucket counts (`sent_rewrite`, `sent_light_edit`, `discarded`) as a map of where to look first: an action-class with a disproportionate `sent_rewrite` count relative to its `sent_unedited` count is itself the signal that class's template or config needs changing, even before the individual diffs are categorized — the rollup says *which class*, step 1's diffs say *what to change*.
 3. **Threshold: pattern occurs ≥3 times in the cycle** before it's worth a config change. Fewer than 3 is noise — do not open a PR for it, note it and keep watching.
 4. For each pattern at or above threshold, **open a PR against the agent's own config/playbook** (not against `packs/shared` or another agent's config) that:
    - States the pattern in one line ("operators removed my second paragraph in 9 of 11 outreach drafts this cycle").
@@ -29,7 +30,7 @@ Weekly, cron-fired, once per agent, after enough of the week's drafts have been 
 
 ## Output contract
 
-- Zero or more PRs per agent per cycle, each scoped to that agent's own config, each carrying evidence (diff count ≥3) and a proposed concrete change — never a vague "improve tone" ask.
+- Zero or more PRs per agent per cycle, each scoped to that agent's own config, each carrying evidence (diff count ≥3, plus the corroborating rollup bucket counts for that action-class where available) and a proposed concrete change — never a vague "improve tone" ask.
 - No self-merges, ever, regardless of how confident the pattern is.
 - A short retro log entry even when no pattern crossed threshold ("no pattern ≥3 occurrences this cycle").
 

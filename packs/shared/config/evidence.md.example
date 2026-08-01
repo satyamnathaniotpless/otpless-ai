@@ -1,0 +1,38 @@
+<!-- Purpose: per-agent config telling the metrics skill and trust ladder which action-classes this agent is accumulating evidence for and where — every agent instantiates its own copy (ADR-005: this is data, not process). -->
+
+# Evidence config: {agent-name}
+
+Copy this file to `evidence.md` inside the agent's own scope config directory (e.g. `packs/recruiting/config/evidence.md`) and fill every field before the scope starts producing drafts. This file does not itself contain any evidence — it points the `metrics` skill (`packs/shared/metrics/SKILL.md`) at what to measure and where to write it. The evidence itself lives in the ledger (qm scope storage, never here) and the rollup (`platform/evidence/{agent-scope}/`, generated — never hand-edited).
+
+## Action-classes tracked
+
+One row per distinct action-class this agent performs, matching the slugs used in `platform/deploy-layer/otpless/command-policy.md` exactly — the rollup, the ledger, and the policy file must all name the same class the same way.
+
+| Action-class | Rollup location | Minimum sample size | Current level | Notes |
+|---|---|---|---|---|
+| {e.g. scheduling_confirmation} | `platform/evidence/{agent-scope}/` | 20 | {L0\|L1\|L2} | {e.g. candidate for L1 once 14 clean days exist} |
+| {e.g. application_acknowledgment} | `platform/evidence/{agent-scope}/` | 20 | {L0\|L1\|L2} | |
+| {add one row per action-class this agent's playbooks produce} | | | | |
+| Offers / comp / terminations / performance judgments / post-interview rejections / policy changes | n/a | n/a | NEVER DELEGATED | No evidence accumulates for these — they never enter the ladder regardless of any rate (see `packs/shared/trust-ladder/SKILL.md`). |
+
+Minimum sample size defaults to 20 (`platform/evidence/README.md`); only raise it here per action-class, never lower it below 20.
+
+## Light-edit threshold
+
+{How this agent's `metrics` skill instance distinguishes `sent_light_edit` from `sent_rewrite` for its own drafts — e.g. "edits touching ≤1 sentence and no changed ask/fact" — a department-specific judgment call, not a platform-wide number. Leave a `TODO(gate)` if not yet decided; do not default silently.}
+
+## Where this agent's evidence lives
+
+| Field | Value |
+|---|---|
+| Ledger (private, qm scope storage, never git) | {agent's qm scope name, e.g. recruiting} |
+| Rollup directory (git, counts only) | `platform/evidence/{agent-scope}/` |
+| Rollup cadence | Weekly, cron-fired — see `packs/shared/metrics/SKILL.md` |
+
+## Current level per class (mirror of command-policy, for quick reference only)
+
+This table is a convenience read; `platform/deploy-layer/otpless/command-policy.md` is the enforced source of truth and this section must never drift from it or be used to justify a level this agent doesn't actually have there.
+
+| Action-class | Level | Evidence window last measured | Rollup file |
+|---|---|---|---|
+| {e.g. scheduling_confirmation} | {L0\|L1\|L2} | {YYYY-MM-DD to YYYY-MM-DD, or "—" if never measured} | {path to the specific rollup file cited, or "—"} |
