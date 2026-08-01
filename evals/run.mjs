@@ -467,8 +467,16 @@ for (const rel of crossRefFiles) {
   const text = readFile(rel);
   const fileDir = path.dirname(rel);
   const candidates = new Set();
-  for (const m of text.matchAll(/\]\(([^)]+)\)/g)) candidates.add(m[1].trim());
-  for (const m of text.matchAll(/`([^`]+)`/g)) candidates.add(m[1].trim());
+  // Strip fenced code blocks BEFORE scanning for inline code spans. A ``` fence is three
+  // backticks; the inline-span regex pairs backticks sequentially, so an unstripped fence
+  // desynchronizes the pairing and every real path reference after it in the file is
+  // silently swallowed into a non-path string. That is a false negative in a check whose
+  // whole job is catching dead references — it reports green precisely where it stopped
+  // looking. Fences carry example output, not live references, so dropping them is correct
+  // as well as necessary.
+  const scannable = text.replace(/^[ \t]*(```|~~~)[\s\S]*?^[ \t]*\1[ \t]*$/gm, "");
+  for (const m of scannable.matchAll(/\]\(([^)]+)\)/g)) candidates.add(m[1].trim());
+  for (const m of scannable.matchAll(/`([^`]+)`/g)) candidates.add(m[1].trim());
   for (const c of candidates) {
     if (!looksLikePath(c)) continue;
     const resolved = resolveCandidate(c, fileDir);
