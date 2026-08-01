@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Purpose: zero-dependency eval harness — STRUCTURE, SKILL SHAPE, LINT, NEVER-DELEGATED
-// COVERAGE, GATE HYGIENE, SECRET-SHAPE GUARD, CROSS-REFERENCE, and RATING FIXTURES checks;
-// exits non-zero on any failure.
+// COVERAGE, GATE HYGIENE, SECRET-SHAPE GUARD, CROSS-REFERENCE, RATING FIXTURES, PROMOTION
+// GATE, and EVIDENCE ROLLUP PII GUARD checks; exits non-zero on any failure.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -23,7 +23,7 @@ const RECRUITING_SKILLS = [
   "candidate-status",
 ];
 
-const SHARED_SKILLS = ["identity", "standup", "retro", "trust-ladder"];
+const SHARED_SKILLS = ["identity", "standup", "retro", "trust-ladder", "metrics"];
 
 const RECRUITING_CONFIG_FILES = [
   "packs/recruiting/config/playbook.md",
@@ -33,7 +33,18 @@ const RECRUITING_CONFIG_FILES = [
   "packs/recruiting/config/goals.md",
 ];
 
-const SHARED_CONFIG_FILES = ["packs/shared/config/goals.md.example"];
+const SHARED_CONFIG_FILES = ["packs/shared/config/goals.md.example", "packs/shared/config/evidence.md.example"];
+
+const PLATFORM_EVIDENCE_FILES = ["platform/evidence/README.md", "platform/evidence/_rollup-template.md"];
+
+// Added only if present on disk when the harness loads (another builder may still be writing
+// it) — never created by this check, and never required if genuinely absent. Because
+// `exists()` re-checks the filesystem every run, once added this becomes a real regression
+// guard: if the file is later deleted, this row starts failing.
+const CONDITIONAL_DOC_FILES = [];
+if (fs.existsSync(path.join(ROOT, "docs/OPERATING_RECRUITER.md"))) {
+  CONDITIONAL_DOC_FILES.push("docs/OPERATING_RECRUITER.md");
+}
 
 const JOB_PLAYBOOKS = [
   "jobs/_template.md",
@@ -145,6 +156,18 @@ for (const p of RECRUITING_CONFIG_FILES) {
 console.log("\n-- shared config files --");
 for (const p of SHARED_CONFIG_FILES) {
   row(exists(p), p);
+}
+
+console.log("\n-- platform evidence --");
+for (const p of PLATFORM_EVIDENCE_FILES) {
+  row(exists(p), p);
+}
+
+if (CONDITIONAL_DOC_FILES.length > 0) {
+  console.log("\n-- conditional docs (present on disk at harness-load time) --");
+  for (const p of CONDITIONAL_DOC_FILES) {
+    row(exists(p), p);
+  }
 }
 
 console.log("\n-- job playbooks (template + 7 roles) --");
@@ -372,6 +395,16 @@ for (const rel of TRACKED) {
 }
 if (secretHits === 0) row(true, `no credential-shaped strings found across ${secretFilesScanned} tracked files`);
 
+// Editor/backup droppings must never be committed. A stray `.bak` beside a canonical file
+// is worse than clutter here: platform/evidence/ is built on "generated, never hand-edited,
+// one file per window," and a duplicate invites someone to edit the wrong one. Caught live
+// once (a `git add <dir>` swept one in), hence the check.
+console.log("\n-- no backup/editor artifacts tracked in git --");
+const ARTIFACT_RE = /(\.bak|\.orig|\.rej|~)$/;
+const artifacts = TRACKED.filter((rel) => ARTIFACT_RE.test(rel));
+for (const rel of artifacts) row(false, `${rel} is a backup/editor artifact committed to git`, "git rm --cached it");
+if (artifacts.length === 0) row(true, `no backup/editor artifacts among ${TRACKED.length} tracked files`);
+
 // ---------------------------------------------------------------------------
 console.log("\n=== 7. CROSS-REFERENCE CHECK (packs/** + platform/** markdown) ===\n");
 
@@ -465,6 +498,139 @@ if (!exists(fixturesPath)) {
     const ok = got === f.expected;
     row(ok, `${f.id} (${f.name})`, `expected=${f.expected} got=${got}`);
   }
+}
+
+// ---------------------------------------------------------------------------
+console.log("\n=== 9. PROMOTION GATE (evals/fixtures/promotions.json) ===\n");
+
+// Implements the arithmetic from platform/evidence/README.md + ADR-008 exactly once, driven
+// entirely by fixtures — this is the sole place in the repo that codes the promotion math.
+// Order matters: sample floor is checked before rate (a small sample is "insufficient
+// evidence", never a rate claim, per ADR-008 and trust-ladder.md), then rate, then window,
+// then the level-specific extra precondition (channel capability for L1 / incidents for L2).
+const PROMOTION_SAMPLE_FLOOR = 20;
+const PROMOTION_RATE_FLOOR = 0.95; // inclusive: rate === 0.95 must pass — `>=`, never `>`.
+const PROMOTION_WINDOW_FLOOR = { L1: 14, L2: 28 };
+
+function evaluatePromotion(f) {
+  const total = f.sent_unedited + f.sent_light_edit + f.sent_rewrite + f.discarded;
+  if (total < PROMOTION_SAMPLE_FLOOR) return "insufficient_evidence";
+  const rate = f.sent_unedited / total;
+  if (rate < PROMOTION_RATE_FLOOR) return "denied_rate";
+  if (f.window_days < PROMOTION_WINDOW_FLOOR[f.level]) return "denied_window";
+  if (f.level === "L1" && !f.capability_verified) return "denied_capability";
+  if (f.level === "L2" && (f.incidents || 0) > 0) return "denied_incident";
+  return "granted";
+}
+
+const promotionsPath = "evals/fixtures/promotions.json";
+if (!exists(promotionsPath)) {
+  row(false, promotionsPath, "fixtures file missing — cannot run promotion-gate checks");
+} else {
+  const promoFixtures = JSON.parse(readFile(promotionsPath));
+  for (const f of promoFixtures) {
+    const got = evaluatePromotion(f);
+    const ok = got === f.expected;
+    row(ok, `${f.id} (${f.agent}/${f.action_class}, ${f.level})`, `expected=${f.expected} got=${got}`);
+  }
+}
+
+// ---------------------------------------------------------------------------
+console.log("\n=== 10. EVIDENCE ROLLUP PII GUARD (platform/evidence/**) ===\n");
+
+// ADR-008: the rollup is counts-only, by construction, not by redaction. This check enforces
+// that structurally (only schema-listed field/column names may appear) and by value-shape
+// (no email, phone, or Notion-page-id-shaped string anywhere under the directory). The
+// agent-scope name (e.g. "recruiting") is a permitted value of the `agent` field — it
+// identifies an agent, not a person — so it is intentionally not flagged by any rule here.
+function walkAll(dir) {
+  const out = [];
+  const abs = path.join(ROOT, dir);
+  if (!fs.existsSync(abs)) return out;
+  for (const entry of fs.readdirSync(abs, { withFileTypes: true })) {
+    const rel = path.join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...walkAll(rel));
+    else if (entry.isFile()) out.push(rel);
+  }
+  return out;
+}
+
+// Union of the two schema tables in platform/evidence/README.md (header fields + per-action-
+// class columns) — the only field/column names allowed to appear as a backtick-quoted first
+// table cell anywhere in this directory.
+const EVIDENCE_HEADER_FIELDS_ALLOWED = new Set([
+  "agent", "window_start", "window_end", "window_days", "generated_at", "generated_by",
+  "source", "known_gaps",
+]);
+const EVIDENCE_TABLE_COLUMNS_ALLOWED = new Set([
+  "action_class", "sent_unedited", "sent_light_edit", "sent_rewrite", "discarded", "total",
+  "evidence_status", "acceptance_rate", "current_level", "incidents_in_window",
+]);
+const EVIDENCE_ALL_FIELDS_ALLOWED = new Set([
+  ...EVIDENCE_HEADER_FIELDS_ALLOWED,
+  ...EVIDENCE_TABLE_COLUMNS_ALLOWED,
+]);
+
+const EVIDENCE_EMAIL_RE = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i;
+// Three digit-groups of 3-4 digits each, each optionally separated by a single dash/dot/
+// space, optionally preceded by a country code — shaped like a phone number. Deliberately
+// does NOT match a YYYY-MM-DD date (whose non-first groups are 2 digits) or an HH:MM:SS
+// timestamp fragment (also 2-digit groups), since both fail the \d{3,4} minimum.
+const EVIDENCE_PHONE_RE = /(?:\+?\d{1,3}[-.\s]?)?\d{3,4}[-.\s]?\d{3,4}[-.\s]?\d{3,4}\b/;
+const EVIDENCE_UUID_RE = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i;
+const EVIDENCE_HEX32_RE = /\b[0-9a-f]{32}\b/i;
+
+const evidenceFiles = walkAll("platform/evidence");
+row(evidenceFiles.length > 0, `found ${evidenceFiles.length} file(s) under platform/evidence/`);
+
+let evidencePiiHits = 0;
+for (const rel of evidenceFiles) {
+  const text = readFile(rel);
+
+  const emailHit = text.match(EVIDENCE_EMAIL_RE);
+  if (emailHit) {
+    row(false, `${rel} contains an email-shaped value`, emailHit[0]);
+    evidencePiiHits++;
+  }
+  const phoneHit = text.match(EVIDENCE_PHONE_RE);
+  if (phoneHit) {
+    row(false, `${rel} contains a phone-number-shaped value`, phoneHit[0]);
+    evidencePiiHits++;
+  }
+  const uuidHit = text.match(EVIDENCE_UUID_RE) || text.match(EVIDENCE_HEX32_RE);
+  if (uuidHit) {
+    row(false, `${rel} contains a Notion-page-id-shaped value`, uuidHit[0]);
+    evidencePiiHits++;
+  }
+
+  // Backtick-quoted field name opening a table row (both the Header field/value tables and
+  // the descriptive per-column tables use this shape) — must be a schema-known name.
+  for (const m of text.matchAll(/^\|\s*`([a-z_]+)`\s*\|/gm)) {
+    const field = m[1];
+    if (!EVIDENCE_ALL_FIELDS_ALLOWED.has(field)) {
+      row(false, `${rel} has an undocumented header field`, field);
+      evidencePiiHits++;
+    }
+  }
+
+  // The actual (non-backtick) per-action-class table header row in a generated/template
+  // rollup — identified by its first cell literally being "action_class" — must contain only
+  // schema-listed columns, nothing added.
+  for (const line of text.split("\n")) {
+    const cells = line.split("|").map((c) => c.trim()).filter(Boolean);
+    if (cells.length === 0 || cells[0].toLowerCase() !== "action_class") continue;
+    const extra = cells.filter((c) => !EVIDENCE_TABLE_COLUMNS_ALLOWED.has(c.toLowerCase()));
+    if (extra.length > 0) {
+      row(false, `${rel} action-class table has undocumented column(s)`, extra.join(", "));
+      evidencePiiHits++;
+    }
+  }
+}
+if (evidencePiiHits === 0) {
+  row(
+    true,
+    `no PII-shaped values or undocumented fields found across ${evidenceFiles.length} file(s) under platform/evidence/`
+  );
 }
 
 // ---------------------------------------------------------------------------
