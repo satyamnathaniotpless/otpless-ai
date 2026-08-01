@@ -23,7 +23,7 @@ All employees past their first 30 days (new joiners get their day-30/60/90 check
 - Company-wide
 - By team
 
-No tenure-band or role-level cut is defined yet — a cut not listed here may not be reported even if the raw data would technically support it (see template §Reporting cuts allowed).
+No tenure-band or role-level cut is defined yet — a cut not listed here may not be reported even if the raw data would technically support it (see template §Reporting cuts allowed). Company-wide is the total that closes the by-team partition: if any team cut is suppressed, the two cuts may not both be published in the same run (`../../config/playbook.md` §Small-N suppression step 5) — by default the by-team breakdown is dropped for that run and only Company-wide is published; state which was dropped when publishing.
 
 ## Anonymity contract
 
@@ -32,6 +32,7 @@ No tenure-band or role-level cut is defined yet — a cut not listed here may no
 | `min_cell_size` | 5 (platform floor — not raised here; founder may raise per team size once real headcount is known) |
 | Free-text comments | Never published/relayed as quotes at any N |
 | Suppressed-cut reporting | "Below reporting threshold" |
+| Complementary suppression | A single suppressed team is never published alone (next-smallest team, or the whole by-team breakdown, is suppressed with it); Company-wide and By-team are never both published in a run where a team is suppressed — default: drop By-team, publish Company-wide only (`../../config/playbook.md` §Small-N suppression steps 1-7) |
 
 ## Question set
 

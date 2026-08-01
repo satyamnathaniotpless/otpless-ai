@@ -21,7 +21,7 @@ Every contract carries a `## PII handling` section stating what personal data th
 | Contract | System | Consumed by |
 |---|---|---|
 | [`notion.md`](./notion.md) | Notion (ATS / People spine) | `recruiter` scope (F1, F2, F5, F7, F8, F9); `analyst` scope (funnel/time-in-stage/source-ROI reads, read-only) |
-| [`notion-employees.md`](./notion-employees.md) | Notion — Employees DB + Policies wiki (two objects, one contract by design, not an oversight of the one-system-per-contract convention — see file header) | `onboarder`, `people-ops` scopes; `analyst` scope (headcount/attrition reads, read-only); `culture` scope (anniversary/review-cycle/offboarding metadata, read/checklist-write) |
+| [`notion-employees.md`](./notion-employees.md) | Notion — Employees DB + Policies wiki (two objects, one contract by design, not an oversight of the one-system-per-contract convention — see file header) | `onboarder`, `people-ops` scopes; `analyst` scope (headcount/attrition reads, read-only); `culture` scope (anniversary/review-cycle/offboarding metadata, **read-only**) |
 | [`gmail.md`](./gmail.md) | Gmail | `recruiter` scope (F1, F3, F4, F6, F8) |
 | [`calendar.md`](./calendar.md) | Google Calendar | `recruiter` scope (F1, F5, F8) |
 | [`slack.md`](./slack.md) | Slack | `recruiter`, `onboarder`, `people-ops`, `analyst`, `culture` scopes |
@@ -29,5 +29,8 @@ Every contract carries a `## PII handling` section stating what personal data th
 | [`bgv.md`](./bgv.md) | Background verification vendor (undecided, gate G18) | `onboarder` scope |
 | [`whatsapp.md`](./whatsapp.md) | WhatsApp Business API — candidate/employee messaging channel (no MCP today; account/template/infra decisions undecided, gates G20–G22) | `recruiter`, `onboarder` scopes (drafted text only until an MCP exists) |
 | [`_template.md`](./_template.md) | (blank) | Fill this to add any future system |
+
+**One Notion object is not yet covered by any contract:** the **Culture tracker**, where the `culture` scope's checklist and cadence writes actually go. It does not exist in Notion yet (gate G25), so its shape currently lives in `packs/culture/config/notion.md` as the pack's own read of what it will need. A contract file lands here when the object is created — recorded rather than quietly implied, because "culture writes to the Employees DB" was the wrong assumption this row used to carry.
+
 
 New integration = copy `_template.md`, fill every section, add a row above.

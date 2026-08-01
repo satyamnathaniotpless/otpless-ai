@@ -29,3 +29,7 @@ Append new decisions to the bottom. One line each: date, decision, one-line why.
 | 2026-08-01 | Per-action-class rows do not yet exist in command policy; they compile at deployment (gate G19) | No promotion may cite a policy row that does not exist. |
 | 2026-08-01 | Every integration contract carries a PII handling section, inherited from `_template.md` | Three contracts written in one phase had already diverged on it. |
 | 2026-08-01 | G15 (HRMS credentials) is CTO-owned, not Founder | Master PRD §5 makes CTO the credential owner; the two Founder-owned credential gates each have workspace-admin or spend rationale that G15 lacks. |
+| 2026-08-01 | Survey small-N suppression is complementary and partition-aware, not per-cell | Per-cell suppression is defeated by subtraction, so an anonymity promise that only thresholds each cell is not true. |
+| 2026-08-01 | One owner per metric: funnel-rate metrics defined and computed once by analyst, cited by recruiter | Two independent computations of the same metric give leadership two numbers and no way to tell which is stale. |
+| 2026-08-01 | Scope files carry the canonical action-class slug; pack evidence.md must match exactly | The rollup, the ledger, and the promotion PR all cite the slug, and independent files had already drifted three slugs in each direction. |
+| 2026-08-01 | ADR-005 held for agents four and five: both imported `packs/shared` unchanged | Five independent data points, not two. |

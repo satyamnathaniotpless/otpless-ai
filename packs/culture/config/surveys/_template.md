@@ -20,7 +20,7 @@
 
 ## Reporting cuts allowed
 
-{List every way results may be sliced, e.g. "company-wide," "by team," "by tenure band." Each cut is independently subject to the suppression rule below — a cut not listed here may not be reported, full stop, even if the data would technically allow it.}
+{List every way results may be sliced, e.g. "company-wide," "by team," "by tenure band." Each cut is independently subject to the suppression rule below — a cut not listed here may not be reported, full stop, even if the data would technically allow it. Cuts are also checked against each other, and against any total that closes them, for a differencing risk — see the complementary-suppression steps in `../../config/playbook.md` §Small-N suppression before finalizing this list: do not list a total alongside a partition it closes, and do not list two cuts whose difference could isolate a group below `min_cell_size`.}
 
 ## Anonymity contract
 
@@ -29,6 +29,7 @@
 | `min_cell_size` | 5 (platform floor, `../../config/playbook.md` §Small-N suppression) — may be raised here, never lowered |
 | Free-text comments | Never published/relayed as quotes at any N — private response store only (`../notion.md`) |
 | Suppressed-cut reporting | "Below reporting threshold" — no number, no direction, no N stated |
+| Complementary suppression | A lone suppressed cell is never published alone within its partition (next-smallest cell, or the whole partition, is suppressed with it); a partition's total is never published alongside a suppressed cell in that partition (default: drop the breakdown, publish the total only) — see `../../config/playbook.md` §Small-N suppression steps 1-7 |
 
 ## Question set
 

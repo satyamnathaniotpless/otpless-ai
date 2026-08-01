@@ -799,6 +799,33 @@ if (agreementHits === 0) {
   row(true, `${Object.keys(SCOPE_TO_PACK).length} scope(s) agree with their pack's config and action-class slugs`);
 }
 
+// Survey anonymity survives arithmetic, not just a threshold. Per-cut suppression alone is
+// defeated by differencing: publish 9 of 10 team cuts plus the company total and the
+// suppressed team is recoverable by subtraction. The rules that close that hole are prose in
+// a config file, which means a future edit can delete them and nothing would notice — an
+// anonymity promise that quietly stopped being true. These assertions are the tripwire.
+console.log("\n-- survey suppression rules survive differencing (packs/culture/config/playbook.md) --");
+const SUPPRESSION_RULES = [
+  { name: "complementary suppression", re: /complementary/i },
+  { name: "next-smallest cell also suppressed", re: /next[- ]smallest/i },
+  { name: "total vs partition conflict", re: /partition/i },
+  { name: "overlapping cuts checked against each other", re: /overlapping cut/i },
+  { name: "cumulative disclosure across waves", re: /wave/i },
+];
+const cultPlaybook = "packs/culture/config/playbook.md";
+if (!exists(cultPlaybook)) {
+  row(false, cultPlaybook, "missing — the canonical statement of the suppression rules");
+} else {
+  const cpText = readFile(cultPlaybook);
+  const missingRules = SUPPRESSION_RULES.filter((r) => !r.re.test(cpText));
+  for (const r of missingRules) {
+    row(false, `${cultPlaybook} no longer states: ${r.name}`, "differencing attack reopens");
+  }
+  if (missingRules.length === 0) {
+    row(true, `all ${SUPPRESSION_RULES.length} differencing-resistance rules present`);
+  }
+}
+
 // ---------------------------------------------------------------------------
 console.log("\n=== SUMMARY ===\n");
 console.log(`Total failures: ${failures}`);

@@ -29,6 +29,8 @@ We adopt [yc-software/qm](https://github.com/yc-software/qm) (MIT) as the harnes
 | `packs/recruiting/` | Department #1, agent #1: full hiring loop skills + per-role job playbooks (generic `_template.md` — any future role is one file) |
 | `packs/onboarding/` | Department #2, agents #2–3: 10 skills (notice-period warmth, BGV, paperwork, provisioning, day-one, buddy, 30/60/90 checkins, hire-status, watch, router) + per-role onboarding checklists |
 | `packs/people-ops/` | Department #2, agents #4–5: 6 skills (policy Q&A, HRMS reads, payroll prep, letters, vendor renewals, router) + policy-citation guardrails |
+| `packs/analytics/` | Department #3, agent #6: 7 skills (attrition signals, comp drift, engagement drilldown, survey analysis, metrics, evidence, router) — aggregate-only, structural PII safety |
+| `packs/culture/` | Department #3, agent #7: 7 skills (review tracking, 1:1 cadence, offboarding, pulse-survey cycle, team-tenure heatmap, culture changelog, peer-review agg) — process/judgment separation, structural safety |
 | `brain/` | The company brain: canonical, agent-readable knowledge (git = source of truth; Notion mirror for humans). See ADR-003 |
 | `evals/` | Fixture-based eval harness; CI gate for every skill/playbook change |
 | `agents/` (copy to `.claude/agents/` on first run) | Builder / Reviewer / Evaluator subagent definitions for the build loop |
@@ -48,6 +50,7 @@ We adopt [yc-software/qm](https://github.com/yc-software/qm) (MIT) as the harnes
 - [x] Deployment-ready: contracts, scopes/crons as data, gate ledger, bootstrap preflight, evals x8
 - [x] Measurement layer: draft-acceptance evidence, promotion arithmetic, operator manual (evals x10)
 - [x] Onboarder + People-Ops packs built (not live — gates G1–G9, G14–G19)
+- [x] Analyst + Culture & Growth packs built, WhatsApp contract (not live — gates G1–G9, G14–G25)
 - [ ] qm deployment live — blocked on gates G1–G9 (see `docs/gates.md`)
 - [ ] Recruiter agent on qm, trust ladder L0 → L1
-- [ ] Analyst + Culture & Growth agents (P3)
+- [ ] Department automation playbook (template out to department #2)

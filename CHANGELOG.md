@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.5.0 — 2026-08-01 · P3 department complete
+- Analyst + Culture & Growth packs (7 + 7 skills): attrition signals, comp drift, engagement drilldown, survey analysis; review tracking, 1:1 cadence, offboarding checklist, culture pulse survey cycle, team-tenure heatmap, culture changelog, peer-review aggregation.
+- WhatsApp integration contract (`platform/contracts/whatsapp.md`): capability shape, template approval gate (G21), sender-identity decision (G22), in-draft mode at all trust levels pending MCP build.
+- Scopes + crons: `scopes/analyst.md`, `scopes/culture.md`, 11 new scheduled jobs (company weekly digest, monthly analyst deep-dive, pulse cadence, review-cycle checkins).
+- Gates G20–G25: WhatsApp sender (G20), template approval (G21), sender-identity decision (G22), comp-band market data (G23), pulse-survey tooling (G24), culture tracker Notion (G25).
+- Slug reconciliation: all five scope files carry Slug column matching pack evidence.md; `packs/onboarding/config/evidence.md` created (never existed, blocking onboarder promotions).
+- Decisions: small-N suppression (complementary + partition-aware), one metric owner (analyst computes funnel rates, recruiter cites), scope slug authority, ADR-005 validated by five agents.
+- Evals: 11 → 12 check groups (metric-ownership guard, slug-match validator, new promotion-rate boundary case, survey-suppression partition check); 0 failures.
+- P3 packs built and reviewed, not live (gates G1–G9, G14–G25 open).
+
 ## v0.4.0 — 2026-08-01 · P2 lifecycle agents
 - Onboarder + People-Ops packs (10 + 6 skills): notice-period warmth, BGV, provisioning, onboarding checklist; policy Q&A, HRMS reads, payroll prep, letters, vendor renewals.
 - Integration contracts: `platform/contracts/hrms.md`, `notion-employees.md`, `bgv.md` with PII handling backfilled to all six.
