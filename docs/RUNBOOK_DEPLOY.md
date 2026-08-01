@@ -18,10 +18,11 @@ Live status of every item below (owner, workaround, what's actually blocking): `
 | 8 | Agent public name decision | Founder | Goes into mailbox display name, Slack handle, disclosure line |
 | 9 | Web sign-in (built-in `auth` broker): admin email address, a verified sender, and a Resend API key or SMTP credentials | CTO | qm emails one-time sign-in links; CLI wires the rest. (External IdP instead: drop `"auth"` from services and register `<publicUrl>/auth/callback` exactly) |
 | 10 | Provider: **Fly.io — DECIDED (2026-08-01)**, binding per deployment directory | CTO | Create the Fly.io org + billing; slug `otpless` is local, not globally unique |
+| 11 | Node.js runtime **>= 24** on every machine that runs qm CLI commands (`bootstrap-qm.sh`, `deploy-qm` skill, any operator machine) | CTO | qm hard-refuses to run below Node 24 — this is a genuine blocker to `qm init`/`setup`/`check`/`plan`/`up`, not a footnote. Gate `G26` in `docs/gates.md` |
 
 ## 2. Stand up qm (agent-executable once #1 is done)
 
-Run `platform/scripts/bootstrap-qm.sh` — it preflights every item in §1 (keyed to the gate ids in `docs/gates.md`), refuses to mutate anything if a check is missing, and only on `--apply` runs the sequence below.
+Run `platform/scripts/bootstrap-qm.sh` — it preflights every item in §1 (keyed to the gate ids in `docs/gates.md`, including the Node >= 24 check for G26), refuses to mutate anything if a check is missing, and only on `--apply` runs the sequence below.
 
 No source checkout needed. Create an organization-owned deployment repository that depends on the published package:
 
@@ -32,15 +33,32 @@ npm exec --yes --package=@yc-software/qm@latest -- \
 npm install
 ```
 
-`qm init` materializes `deployment.md` and a **`deploy-qm` agent skill** (`.codex/skills/deploy-qm/`). Hand that skill to the builder agent: it confirms the operator-owned account and billing before any mutation, configures email-gated web onboarding first, adds connectors and Slack, performs live checks, and returns the operational URLs. Initialization does not create deployment CI — deploys are agent/operator-driven by design.
+**Verified against `@yc-software/qm@0.1.4`** (see `docs/ADRS.md` "ADR-001 correction"): `qm init` materializes the real deployment-directory contract (`"contract": 1`) — `qm.config.jsonc` (`orgId`, `publicUrl`, `target`, `modelProvider`, `appPrefix`, `region`, `flyOrg`, `services[]`, `plugins[]`, `skills[]`, per-service `env`/`secretEnv`, `sandbox.app`), `sandbox/skills/<id>/SKILL.md`, `sandbox/tools/<id>/tool.json`, an optional `sandbox/Dockerfile`, the **`deploy-qm` agent skill** (`.codex/skills/deploy-qm/`), plus `.env.example`, `slack-app-manifest.yml`, `AGENTS.md`, `deployment.md`, `package.json`. **There is no `deploy/layers/` directory anywhere in this contract.**
 
-Merge `platform/deploy-layer/otpless/` from this repo into the deployment directory (same shape `qm init` produces). Security posture: **Auto** org-wide; People-Ops scope starts **Strict**. Load the command policy (trust ladder, ADR-004) before the first agent scope is created.
+Hand `deploy-qm` to the builder agent: it confirms the operator-owned account and billing before any mutation, configures email-gated web onboarding first, adds connectors and Slack, performs live checks, and returns the operational URLs. Initialization does not create deployment CI — deploys are agent/operator-driven by design.
 
-**Later, only if we customize qm core** (custom tools in core, plugin changes): seed the private fork per ADR-001 (plain bare clone + mirror push, never GitHub's Fork button) and move the layer into `deploy/layers/otpless/` there; `update-qm` / `upstream-pr` skills maintain the upstream boundary.
+Compile `platform/deploy-layer/otpless/org-config.md` and `command-policy.md` into `qm.config.jsonc` (exact field mapping, and what's still unverified, in `platform/deploy-layer/otpless/README.md` — do not copy the directory anywhere; it stays in this repo as the authored source). Security posture: **Auto** org-wide; People-Ops scope starts **Strict**. Load the command policy (trust ladder, ADR-004) before the first agent scope is created.
 
-## 3. Import skill packs
+Then run the real qm workflow, in order, inside the deployment repo:
 
-qm imports skill packs from git repos. Point the deployment at git@github.com:satyamnathaniotpless/otpless-ai.git — packs/shared and packs/recruiting. Create scope `recruiter` with the identity kit from `packs/shared/identity` and config from `packs/recruiting/config/` (fill `user.md` from `user.md.example`).
+```bash
+npm exec qm -- setup   # walks secrets into qm's own keychain
+npm exec qm -- check   # validates config + sandbox, verifies credentials against providers
+npm exec qm -- plan    # reports what `up` would do — no mutation
+npm exec qm -- up      # pulls images, starts services, prints operational URLs
+```
+
+> **Do not point a Fly app at this repository or at the qm-deploy repo's source.** qm does not build from source — `qm up` selects immutable runtime image digests from its release manifest and orchestrates the Fly apps itself. Running `flyctl launch` against either repo fails with:
+> ```
+> Could not detect runtime or Dockerfile
+> ```
+> — correctly: neither repo contains a buildable service, and none is planned. Only `qm up` deploys.
+
+**Later, only if we customize qm core** (custom tools in core, plugin changes): seed the private fork per ADR-001 (plain bare clone + mirror push, never GitHub's Fork button); `update-qm` / `upstream-pr` skills maintain the upstream boundary. There is no `deploy/layers/otpless/` destination to move anything into — the fork question is separate from where our deploy config lives.
+
+## 3. Load our skill packs
+
+Per the verified contract, qm does **not** import skill packs from a git URL — `skills[]` in `qm.config.jsonc` points at directories of `SKILL.md` mounted into the agent, alongside/inside `sandbox/skills/<id>/SKILL.md`. Point `skills[]` (or populate `sandbox/skills/`) at this repo's `packs/shared` and `packs/recruiting` directories. Exactly how a path living in this repo (`otpless-ai`, not the deployment repo) reaches `skills[]` — checked out as a build step, a mounted path, or copied in during `qm init`/CI — is **unverified**; `TODO(gate)`: confirm by running `qm check` against a config that references it, then record the real mechanism here and in `platform/deploy-layer/otpless/README.md`. Create scope `recruiter` with the identity kit from `packs/shared/identity` and config from `packs/recruiting/config/` (fill `user.md` from `user.md.example`).
 
 ## 4. Verification checklist (agent-executable)
 

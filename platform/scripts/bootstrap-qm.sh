@@ -25,9 +25,10 @@ tool / auth state required by docs/gates.md, prints a PASS/MISSING table keyed
 to gate IDs, and exits. Never mutates anything.
 
 --apply: if and only if every required check passes, runs the RUNBOOK_DEPLOY.md
-§2 sequence (create deployment repo, qm init, npm install, copy the deploy
-layer in), then stops and prints the manual/agent-driven follow-ups. Refuses
-to run (exits non-zero, no side effects) if any preflight check is MISSING.
+§2 sequence (create deployment repo, qm init, npm install), then stops and
+prints the real follow-up sequence (compile config, qm setup/check/plan/up,
+etc.) as manual/agent-driven next steps. Refuses to run (exits non-zero, no
+side effects) if any preflight check is MISSING.
 
 Reads all values from environment variables. Never echoes a value that could
 contain a secret — only PASS/MISSING against variable NAMES.
@@ -95,6 +96,27 @@ check_gh_auth() {
   fi
 }
 
+check_node_version() {
+  # G26 — Node.js runtime >= 24 (qm hard-refuses to run below it). Reports the
+  # detected version; never treated as a plain CLI-presence check like TOOL rows.
+  local gate="G26" desc="Node.js runtime >= 24 (qm requirement)"
+  if ! command -v node >/dev/null 2>&1; then
+    ALL_PASS=0
+    ROWS+=("$gate|$desc|MISSING|node not on PATH")
+    return
+  fi
+  local ver major
+  ver="$(node -v 2>/dev/null || true)"
+  major="${ver#v}"
+  major="${major%%.*}"
+  if [[ "$major" =~ ^[0-9]+$ ]] && [ "$major" -ge 24 ]; then
+    ROWS+=("$gate|$desc|PASS|(detected $ver)")
+  else
+    ALL_PASS=0
+    ROWS+=("$gate|$desc|MISSING|detected ${ver:-unknown}, need >= 24")
+  fi
+}
+
 check_g8() {
   # G8 passes on EITHER the AGENT_PUBLIC_NAME env var OR a filled-in
   # "Agent public name" row (no longer containing TODO(gate)) in org-config.md.
@@ -120,7 +142,14 @@ check_g8() {
 check_env "G1" "Fly.io org + API token" FLY_ORG FLY_API_TOKEN
 
 # G2 — Managed Postgres
-check_env "G2" "Managed Postgres connection string" DATABASE_URL
+# G2 is target-dependent. qm's own .env.example marks DATABASE_URL "Needed when the target
+# is aws" — on Fly, `qm up` provisions Managed Postgres and private object storage itself,
+# so demanding a connection string up front would block a deploy that never needed one.
+if [ "${QM_TARGET:-fly}" = "aws" ]; then
+  check_env "G2" "Managed Postgres connection string (aws target)" DATABASE_URL
+else
+  ROWS+=("G2|Managed Postgres|N/A|provisioned by 'qm up' on the fly target")
+fi
 
 # G3 — Anthropic API key + budget cap
 check_env "G3" "Anthropic API key" ANTHROPIC_API_KEY
@@ -160,9 +189,10 @@ ROWS+=("G10|Provider decision (Fly.io)|PASS|(decided 2026-08-01; see docs/gates.
 # G11 — Trust-ladder L1 promotion: not applicable pre-deploy, informational only.
 ROWS+=("G11|Trust-ladder L1 promotion|N/A|not applicable before deploy is live")
 
-# npm / node tooling required for qm init regardless of gates
+# npm tooling required for qm init regardless of gates; node's presence AND
+# version are checked together as gate G26 (qm hard-requires Node >= 24).
 check_cli "TOOL" "npm installed" npm
-check_cli "TOOL" "node installed" node
+check_node_version
 
 # ---------------------------------------------------------------------------
 # Print PASS/MISSING table
@@ -222,23 +252,22 @@ git clone "git@github.com:${GH_ORG}/${DEPLOY_REPO_NAME}" "$DEPLOY_DIR"
   npm install
 )
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LAYER_SRC="${SCRIPT_DIR}/../deploy-layer/otpless"
-LAYER_DST="${DEPLOY_DIR}/deploy/layers/otpless"
-
-echo "-> copying platform/deploy-layer/otpless/ into ${LAYER_DST}"
-mkdir -p "$(dirname "$LAYER_DST")"
-cp -R "$LAYER_SRC" "$LAYER_DST"
-
 echo ""
 echo "== Stand-up sequence complete. Stopping here — the following are NOT run by this script: =="
-echo "  1. Hand the deploy-qm skill (${DEPLOY_DIR}/.codex/skills/deploy-qm/) to the builder agent:"
+echo "  1. Compile platform/deploy-layer/otpless/org-config.md and command-policy.md into"
+echo "     ${DEPLOY_DIR}/qm.config.jsonc, per the field mapping in"
+echo "     platform/deploy-layer/otpless/README.md (some mappings, e.g. where command-policy.md"
+echo "     lands, are marked unverified there — do not invent a field to fill the gap)."
+echo "  2. Hand the deploy-qm skill (${DEPLOY_DIR}/.codex/skills/deploy-qm/) to the builder agent:"
 echo "     it confirms operator-owned account/billing, configures email-gated web onboarding,"
 echo "     adds connectors and Slack, performs live checks, returns operational URLs."
-echo "  2. Translate deploy/layers/otpless/org-config.md and command-policy.md into qm-native"
-echo "     config format (per platform/deploy-layer/otpless/README.md step 3)."
-echo "  3. Load the command policy BEFORE creating the first agent scope (ADR-004)."
-echo "  4. Create scope 'recruiter' with identity kit + config (RUNBOOK_DEPLOY.md §3)."
-echo "  5. Run platform/scripts/verify-deployment.md checks before calling this live."
+echo "  3. Run, in order, inside ${DEPLOY_DIR}:"
+echo "       npm exec qm -- setup   # walks secrets into qm's own keychain"
+echo "       npm exec qm -- check   # validates config + sandbox, verifies credentials"
+echo "       npm exec qm -- plan    # reports what 'up' would do, no mutation"
+echo "       npm exec qm -- up      # pulls images, starts services, prints operational URLs"
+echo "  4. Load the command policy BEFORE creating the first agent scope (ADR-004)."
+echo "  5. Create scope 'recruiter' with identity kit + config (RUNBOOK_DEPLOY.md §3)."
+echo "  6. Run platform/scripts/verify-deployment.md checks before calling this live."
 echo "None of the above are executed by this script — they require the deploy-qm skill,"
 echo "human/CTO judgment, or come after this stage in the runbook."

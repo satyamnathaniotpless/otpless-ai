@@ -10,6 +10,30 @@
 
 **Staging (amended):** deployment does not require the fork — `qm init` from the published `@yc-software/qm` package materializes a config-only deployment repo, which is how we go live (RUNBOOK §2). The private fork is adopted lazily, at the first moment we need to customize core or read core + customizations in one tree; until then it's deferred cost. When adopted: plain bare-clone + mirror push (never GitHub's Fork button), layer in `deploy/layers/otpless/`, upstream CI runs in our account.
 
+### ADR-001 correction (2026-08-01) — the `deploy/layers/` directory contract does not exist
+
+**What we got wrong.** ADR-001 above, `docs/RUNBOOK_DEPLOY.md` §2–§3, and `platform/deploy-layer/otpless/README.md` all state that OTPLESS-specific material lives in the deployment repo at `deploy/layers/otpless/`, "matching qm's documented layer-directory contract." **There is no such contract.** Verified by running `qm init . --org otpless --target fly` against the published `@yc-software/qm@0.1.4` and inspecting what it actually materializes.
+
+**The real deployment-directory contract (`"contract": 1`):**
+
+| Real artifact | What it holds | What we had assumed |
+|---|---|---|
+| `qm.config.jsonc` | orgId, publicUrl, target, modelProvider, appPrefix, region, flyOrg, `services[]`, `plugins[]`, `skills[]`, per-service `env` / `secretEnv`, sandbox app | our `org-config.md` compiles here |
+| `sandbox/skills/<id>/SKILL.md` | the sandbox layer — skills mounted into the agent | we expected a layer directory |
+| `sandbox/tools/<id>/tool.json` | custom tools, executable alongside | not previously modelled |
+| `sandbox/Dockerfile` (optional) | only for extra system packages | — |
+| `skills: []` in config | **extra directories of SKILL.md mounted into the agent** — this is how our packs load | we assumed a git-URL skill-pack import |
+| `.codex/skills/deploy-qm/` | the deploy agent skill qm ships | as documented |
+
+**Two further corrections of fact:**
+
+1. **qm requires Node ≥ 24.** The CLI refuses to run below it. Neither the runbook nor gate G1 mentioned a runtime prerequisite.
+2. **qm does not build from source, so a Fly app must never be pointed at a source repo.** The CLI selects immutable runtime image digests from its release manifest and orchestrates the Fly apps itself via `qm up`. Running `flyctl launch` against this repository fails with "Could not detect runtime or Dockerfile" — correctly, because `otpless-ai` is skill packs and config, not a service. There is nothing here for Fly to build, and there never will be.
+
+**Why this matters beyond the file paths.** This is the platform's own documentation committing the failure mode the department playbook warns about — a capability assumed rather than verified — and it survived four phases because nothing executed against the real package until now. ADR-007 exists because the Gmail connector could not do what we assumed; this correction exists for the same reason, one layer down. The lesson generalizes: an integration contract written from a README is a hypothesis until something runs.
+
+**What does not change:** the substance of ADR-001. qm core stays unforked, our material stays separate and version-controlled here, and the private fork remains deferred. Only the mechanism by which our material reaches the deployment was wrong.
+
 ## ADR-002 — Model & token policy
 
 **Decision:** haiku for mechanical transforms; sonnet as the default workhorse for skills/code/reviews/fixtures; top-tier model only for architecture, ambiguous judgment, and final phase reviews. Subagents receive paths not payloads; reads are batched and never repeated within a session; edits preferred over regeneration. qm scopes inherit the same policy: watch/cron loops run on the cheapest model that passes that loop's eval fixtures.
