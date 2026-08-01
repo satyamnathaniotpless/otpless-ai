@@ -1,0 +1,70 @@
+<!-- Purpose: the people-ops qm scope — steady-state HR operations, instantiated from scopes/_template.md per master PRD §4 row 3. -->
+
+# Scope: people-ops
+
+## Scope id
+
+`people-ops` — order 3 in `org-config.md` Scopes table, P2. **Starts on Strict posture per `command-policy.md` §1/§7** (org-config.md's own Scopes table already notes this).
+
+## Agent identity config pointer
+
+`packs/people-ops/config/agent.md` — TODO(gate): agent public name, who: Founder (gate G8, `docs/gates.md`; same naming gate the recruiting agent's name is waiting on — PRD §11 open question 6). Filled from `packs/shared/config/agent.md.example`.
+
+## Packs imported
+
+1. `packs/shared` (identity, trust-ladder, retro, goals/standup — always first)
+2. `packs/people-ops` — policy Q&A (citation-only), leave/attendance/expense-status HRMS queries, payroll-cutoff input packets, letters (drafts), vendor-renewal reminders (master PRD §4 row 3)
+
+## Connectors required
+
+- Notion (Policies wiki + Employees DB cross-reference): `platform/contracts/notion-employees.md` — TODO(gate): neither object exists yet (gates G16, G17, `docs/gates.md`); People-Ops is read-only against both
+- HRMS (read-only leave/attendance/employee-record queries + payroll-cutoff calendar): `platform/contracts/hrms.md` — TODO(gate): provider undecided, no credentials (gates G14, G15, `docs/gates.md`). **Strict posture (below) governs any HRMS write attempt for this scope — see Security posture.**
+- Slack (#people): `platform/contracts/slack.md`
+- Gmail (letters drafts — employment verification, address proof; a human signatory sends): `platform/contracts/gmail.md`
+- Google Calendar: not bound yet — `packs/people-ops/config/agent.md` defers this ("add when a skill needs it"); no `people-ops` skill exercises Calendar in P2, so it is not listed as required here (ADR-005: don't bind a connector before a skill needs it)
+
+## Security posture
+
+**Strict** on any HRMS write, per `command-policy.md` §1/§7 — Strict requires human approval on every write regardless of content-screening result, until that action-class earns L1 evidence. In P2 this scope performs **zero** HRMS writes: its only HRMS interaction is read-only queries plus a drafted "payroll input packet" handed to the accountable human (`platform/contracts/hrms.md` — "What we write: None"). Strict is recorded as this scope's standing posture for that action-class now, ahead of any write path existing, so the policy is already correct the day an HRMS-write action-class is ever proposed — it does not default to Auto by omission. Every other action-class this scope performs (policy Q&A, HRMS reads, letters, vendor renewals) runs on org-default **Auto**.
+
+## Cron ids bound
+
+- `people-ops-payroll-cutoff-reminder` (payroll-cutoff input packet, cadence pending HRMS provider decision)
+- `people-ops-vendor-renewal-reminder`
+- `people-ops-standup` (08:30 IST → #people)
+- `people-ops-evidence-rollup` (weekly promotion-evidence rollup)
+- `people-ops-retro` (weekly playbook-PR retro)
+
+See `crons.md` for full schedule detail.
+
+## Action-classes with current trust level
+
+| Action-class | Current level | Notes |
+|---|---|---|
+| Policy Q&A response (employee-facing) | L0 | Never answerable at all without a citation to a real Policies-wiki page (`platform/contracts/notion-employees.md`), regardless of level; candidate for L1 once 2 weeks of unedited-draft evidence exists |
+| Leave/attendance/expense-status query response | L0 | Read-only against HRMS; candidate for L1 as a routine, low-judgment class |
+| Letter draft (employment verification, address proof, ...) | L0 | Always requires a human signatory regardless of level — promotion affects draft-to-signatory speed, never removes the signature step |
+| Payroll input packet (to accountable human, ahead of HRMS cutoff) | L0 (internal coordination, not an external send) | Never promotes to an HRMS write — P2 hard scope limit per `platform/contracts/hrms.md`; revisit only after the HRMS provider decision (gate G14) and a written ADR |
+| Vendor renewal notice/reminder | L0 | Any spend/contract commitment is a human gate (CLAUDE.md autonomy & human gates) regardless of trust-ladder level |
+| HRMS write of any kind | **NOT IN SCOPE (P2)** | Not an action-class this scope performs at all — **Strict posture is the standing backstop** (`command-policy.md` §1/§7) for the day a write path is ever proposed; revisit only when Keka vs RazorpayX is decided (gate G14) and a written ADR supersedes this line |
+| Offers / comp / terminations / performance judgments / post-interview rejections / policy changes | NEVER DELEGATED | Hard deny, `command-policy.md` §4, all postures, all levels |
+
+## Accountable human
+
+Founder — reviews this agent's PRs, drafts, and incidents until a People Lead is hired (master PRD §5; `packs/people-ops/config/agent.md`).
+
+## Memory / knowledge sources
+
+- `brain/` — company policies (git-canonical per ADR-003), decisions, and the people-ops playbook
+- `packs/people-ops/config/agent.md` — identity, goals summary, trust-ladder mirror
+- `packs/people-ops/config/letters/` — letter templates (no PII, synthetic fixtures only per CLAUDE.md conventions)
+- `packs/people-ops/config/goals.md` — scoreboard
+
+## Gates outstanding
+
+- TODO(gate): agent public name — who: Founder (gate G8, `docs/gates.md`)
+- TODO(gate): Notion Employees DB creation + machine-user grant — who: Founder (gate G16, `docs/gates.md`)
+- TODO(gate): Notion Policies wiki creation + machine-user grant — who: Founder (gate G17, `docs/gates.md`)
+- TODO(gate): HRMS provider decision — who: Founder (gate G14, `docs/gates.md`)
+- TODO(gate): HRMS credentials — who: Founder (gate G15, `docs/gates.md`)
+- TODO(gate): this agent's own mailbox/Slack bot handle/GitHub account — who: CTO. No gate row in `docs/gates.md` currently names this distinctly (G5/G6/G9 are worded specifically for the `recruiter` scope's identity) — flagged as a gap in the phase report rather than assigned a fabricated ID here

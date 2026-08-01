@@ -1,0 +1,37 @@
+<!-- Purpose: operator & agent identity template — copy to user.md, fill in, gitignore the real file (no PII or secrets in this template, same convention as packs/recruiting/config/user.md.example). -->
+
+# user.md — operator & agent identity (copy to user.md, fill in, gitignore the real file)
+
+## Agent identity
+
+- **Agent name:** {AgentName} — same naming pass as the recruiting agent (PRD §11 open question 6); pick once, reuse the scheme.
+- **Agent mailbox:** TODO(gate): not provisioned — see `agent.md`
+- **Disclosure signature** (every hire-facing WhatsApp/email message ends with this, non-negotiable):
+  ```
+  — {AgentName}, OTPLESS's onboarding agent (AI), working with Satyam
+  ```
+- **Agent Slack handle:** @{AgentName} (posts in #people as itself once its qm scope is live)
+- **Agent Notion user:** {machine user name} (every Employees DB / checklist edit attributed to the agent, once that DB exists)
+
+## Operators
+
+| Operator | Role | Owns | Email |
+|---|---|---|---|
+| Satyam | Founder | All offers/comp/closes; final say on any escalated counteroffer or BGV flag | satyam@otpless.com |
+| {CTO name} | CTO | Provisioning approvals, IT/Admin liaison, technical-role buddy pool | {cto email} |
+| {People Lead name, once hired} | Founding Recruiter → People Lead | Day-to-day queue ownership, playbook tuning, SLA ownership (master PRD §5) | {people lead email} |
+
+## Logistics
+
+- **Timezone:** Asia/Kolkata (IST) — always schedule and display dates/times in IST.
+- **Slack channel:** #people (shared with the recruiting agent and, later, People-Ops)
+- **Office address:** {Bangalore office address placeholder — for day-one logistics}
+- **IT/Admin contact for provisioning:** {name/email — until an IT ticketing system is named in `vendors.md`, requests go to this person directly}
+
+## Hire channel preference
+
+WhatsApp > email, same as recruiting (master PRD §6). Until WhatsApp Business API lands (Phase 3), the agent drafts message text for a human to paste — same draft-first approval gate applies as email.
+
+## Buddy pool
+
+- {Team/role → candidate buddies, refreshed as headcount grows — no fixed roster here; `buddy-assignment/SKILL.md` proposes from whoever the operator names as available}

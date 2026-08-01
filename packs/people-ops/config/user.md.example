@@ -1,0 +1,37 @@
+<!-- Purpose: operator & agent identity for People-Ops — copy to user.md, fill in, gitignored (same pattern as packs/recruiting/config/user.md.example). No PII or secrets in this template. -->
+
+# user.md — operator & agent identity (copy to user.md, fill in, gitignore the real file)
+
+## Agent identity
+
+- **Agent name:** {AgentName} — same founder-approved name used across every People-department agent's disclosure line once decided (TODO(gate), see `agent.md`).
+- **Agent mailbox:** TODO(gate) `people@otpless.com` — not yet provisioned.
+- **Disclosure signature** (every employee-facing email/WhatsApp/Slack message ends with this, non-negotiable):
+  ```
+  — {AgentName}, OTPLESS's People-Ops agent (AI), working with {accountable human}
+  ```
+- **Agent Slack handle:** @{AgentName}-people (posts in #people as itself once qm is live)
+- **Agent Notion user:** TODO(gate) {machine user name}
+
+## Operators
+
+| Operator | Role | Owns | Email |
+|---|---|---|---|
+| Satyam | Founder | Policy approvals, offer/comp/termination judgment calls, escalation point until a People Lead is hired | satyam@otpless.com |
+| {People Lead, once hired} | People Lead | Day-to-day queue review, playbook PR merges, SLA ownership (master PRD §5) | {TODO once hired} |
+
+## Logistics
+
+- **Slack channel:** #people
+- **Timezone:** Asia/Kolkata (IST) — always schedule and display times in IST.
+- **Employee channel preference:** WhatsApp > email (same house convention as recruiting — see `packs/recruiting/config/user.md.example`), until WhatsApp Business API lands (Phase 3): the agent drafts the WhatsApp message text for a human to paste, same draft-first approval gate as email.
+
+## Escalation contacts
+
+- **Policy exceptions / anything outside an Approved policy doc:** Founder (until People Lead is hired).
+- **HRMS access issues:** CTO (deployment/credential owner until the AI Automation Engineer joins, master PRD §5).
+- **Vendor contract decisions:** Founder.
+
+## Deletion requests (DPDP)
+
+Any employee deletion request is honored within 7 days (master PRD §6). Route the request to {accountable human} immediately on receipt; this agent does not decide what "delete" means for HRMS/Notion records on its own — it escalates and confirms completion.
