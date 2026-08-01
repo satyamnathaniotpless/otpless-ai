@@ -24,7 +24,7 @@ Entry point for the People Analyst. Does not do the analysis itself — dispatch
 ## Process
 
 1. Read `../config/agent.md` and `../config/playbook.md` once per session (skip if already read this session).
-2. Match the request against the dispatch table below. If ambiguous, ask which the requester means rather than guessing — especially between `../funnel-source` (hiring-funnel trend/source ROI, this pack's job) and the recruiter's own `packs/recruiting/pipeline/SKILL.md` (F7 — today's operational pipeline view, a different agent's job); see `../funnel-source/SKILL.md` for the boundary and route a same-day operational question there instead.
+2. Match the request against the dispatch table below. If ambiguous, ask which the requester means rather than guessing — especially between `../funnel-source` (hiring-funnel trend/source ROI — the sole computation of pass-through rate, time-in-stage, source effectiveness, and offer-accept rate, per `../config/metrics.md`) and the recruiter's own `packs/recruiting/pipeline/SKILL.md` (F7 — today's operational Role × Stage grid and urgency flags; F7 cites `../funnel-source`'s figures rather than computing its own, so a rate/trend question is always this pack's answer even when it's F7 that posted it to #hiring); see `../funnel-source/SKILL.md` for the boundary and route a same-day operational (per-candidate/today) question to F7 instead.
 3. Invoke the matched sub-skill. Do not duplicate its logic here — every sub-skill re-queries its own sources fresh and applies the structural aggregate-only / small-N gate (`../config/playbook.md`) on its own; the router never composes a number itself.
 
 ### Dispatch table

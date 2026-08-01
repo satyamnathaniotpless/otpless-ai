@@ -19,6 +19,7 @@ Every skill in this pack reads its numbers, formulas, and thresholds from here. 
 - **Time-in-stage (aggregate)**: median and mean calendar days a *cohort* (role × stage, over the report's window) has spent in that stage, computed from the Notion Stage-change timestamp. This is a different statistic from the recruiter's `pipeline` skill (F7), which reports a *specific candidate's* current days-in-stage to flag it for action — see `../funnel-source/SKILL.md` for the boundary.
 - **Source ROI**: for a given Source value (`packs/recruiting/config/notion.md` Source values) and window, `advances_from_source ÷ applicants_from_source` (advance rate) and `hires_from_source ÷ applicants_from_source` (hire rate). No cost-per-source figure is computed — no source-acquisition-cost data exists in any system this pack reads; do not estimate one.
 - **Pass-through rate**: `count_at_stage_N ÷ count_at_stage_N-1`, per role, per window.
+- **Offer-accept rate**: `offers_accepted ÷ offers_extended` (Stage `Offer` → `Hired` vs. `Offer` → `Rejected`/withdrawn at that stage, per `packs/recruiting/config/notion.md` Stage values), per role, per window. This is the fourth metric the recruiter's weekly `#hiring` report cites — see `../funnel-source/SKILL.md` and `packs/recruiting/pipeline/SKILL.md` for the single-owner split.
 
 ## Headcount
 

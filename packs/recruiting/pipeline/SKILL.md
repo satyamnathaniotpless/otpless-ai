@@ -7,6 +7,10 @@ description: |
 
 # Pipeline & Analytics (F7)
 
+## Boundary with the analyst's `funnel-source` skill — read this first
+
+This skill owns everything operational and per-candidate: the Role × Stage grid, urgency flags, pipeline-depth-vs-target, and the Monday `#hiring` post itself. It does **not** own pass-through rate, time-in-stage (aggregate), source effectiveness, or offer-accept rate — those are defined once in `packs/analytics/config/metrics.md` and computed once by `packs/analytics/funnel-source/SKILL.md`, the single owner of that math for every audience. This skill cites that skill's most recent figures by source and window rather than recomputing them, and says so plainly if no figure yet exists. See `packs/analytics/funnel-source/SKILL.md`'s own boundary note for the reverse direction — the two files agree.
+
 ## Trigger
 
 "pipeline", "funnel", "priorities", "full pipeline", "weekly report" (also runs automatically Mondays via `../recruit-watch`).
@@ -16,6 +20,7 @@ description: |
 - `../config/notion.md` (Stage values, Role values)
 - Notion Applicants data source (fresh, all roles)
 - Funnel targets: 150–200 sourced → 25–30 screens → 8–10 work samples → 4–5 onsites → 1–2 offers → 1 join, per role
+- `packs/analytics/funnel-source/SKILL.md`'s most recent output (pass-through rate, time-in-stage, source effectiveness, offer-accept rate) — cited, never recomputed; definitions live in `packs/analytics/config/metrics.md`, not restated here.
 
 ## Process
 
@@ -23,14 +28,14 @@ description: |
 2. Build a Role × Stage grid with counts.
 3. Compute days-in-stage per candidate from the Notion Stage-change timestamp; flag 🔴 if >5 days.
 4. Compare each role's pipeline depth to the funnel targets above; flag any role with <10 total in pipeline.
-5. Compute pass-through rates, time-in-stage, source effectiveness (from Source property), and offer-accept rate.
+5. For pass-through rates, time-in-stage, source effectiveness, and offer-accept rate: cite `packs/analytics/funnel-source/SKILL.md`'s most recent figures, naming that skill and its window (e.g. "per Analyst funnel-source, week of Aug 25") — this skill never computes these independently. If no analyst figure exists yet (that skill hasn't run this window), say so plainly in the post rather than computing one here.
 6. On Mondays (or when asked for the weekly report), post the summary to Slack #hiring.
 7. If a flag here leads to an action (reject a stale candidate, nudge an owner), hand off to the matching sub-skill — this skill never sends itself; every write still goes through that sub-skill's `d) draft  s) send  e) edit  ?) something else` prompt.
 
 ## Output contract
 
-Grid: Role × Stage counts, urgency column (🔴 >5 days / 🟡 3-5 / 🟢 fresh). Below it: funnel-vs-target table and any role flagged for low depth. Header states `Checked: Notion (all roles, all stages)` per the split-brain rule — always re-query, never reuse a grid built earlier in the session.
+Grid: Role × Stage counts, urgency column (🔴 >5 days / 🟡 3-5 / 🟢 fresh). Below it: funnel-vs-target table and any role flagged for low depth. Below that, for the Monday post: pass-through rate, time-in-stage, source effectiveness, and offer-accept rate cited from `packs/analytics/funnel-source/SKILL.md` by source and window — or "no analyst figure available yet" if none has run, never a self-computed number in its place. Header states `Checked: Notion (all roles, all stages)` per the split-brain rule — always re-query, never reuse a grid built earlier in the session.
 
 ## Failure behavior
 
-If a Stage-change timestamp is missing (can't compute days-in-stage), say so per-candidate rather than omitting them from the grid. If Slack posting fails, present the report in-session anyway and note the post failed. Update the Notion row anytime this skill's drill-down produces an action (e.g. flagging a stale candidate that leads to a decision).
+If a Stage-change timestamp is missing (can't compute days-in-stage), say so per-candidate rather than omitting them from the grid. If Slack posting fails, present the report in-session anyway and note the post failed. Update the Notion row anytime this skill's drill-down produces an action (e.g. flagging a stale candidate that leads to a decision). If `packs/analytics/funnel-source/SKILL.md` has no figure for the window (not yet run, or unreachable), state that plainly in the post — never compute a pass-through/time-in-stage/source-effectiveness/offer-accept number here as a substitute.
