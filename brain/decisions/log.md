@@ -23,3 +23,9 @@ Append new decisions to the bottom. One line each: date, decision, one-line why.
 | 2026-08-01 | The evidence window is quantized to weekly rollup boundaries | Promotions are merged at the weekly ops review, so daily recomputation produces a number nobody consumes. |
 | 2026-08-01 | Promotion PRs come from the metrics/rollup step, playbook PRs from retro, never combined | A human should never be asked to approve a tone change and an autonomy increase in one review. |
 - 2026-08-01 · **Hosting: Fly.io** for the qm deployment (binding per deployment directory; AWS would require a fresh init). Decided by founder.
+| 2026-08-01 | ADR-005 validated by two independent agents built without coordination | The claim that packs/shared is reusable was previously untested outside the department it was designed for. |
+| 2026-08-01 | `brain/` is canonical for policy; Notion Policies wiki is its mirror, per ADR-003 | The wiki serves as drift detector; disagreement between the two means escalate, never invent policy. |
+| 2026-08-01 | Slack DM is not a private channel — no HRMS field value, payroll figure, or document goes to Slack including DMs | A DM feels private and is not; that's exactly the access control property employee data must not lose. |
+| 2026-08-01 | Per-action-class rows do not yet exist in command policy; they compile at deployment (gate G19) | No promotion may cite a policy row that does not exist. |
+| 2026-08-01 | Every integration contract carries a PII handling section, inherited from `_template.md` | Three contracts written in one phase had already diverged on it. |
+| 2026-08-01 | G15 (HRMS credentials) is CTO-owned, not Founder | Master PRD §5 makes CTO the credential owner; the two Founder-owned credential gates each have workspace-admin or spend rationale that G15 lacks. |

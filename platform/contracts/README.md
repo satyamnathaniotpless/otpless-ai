@@ -24,7 +24,9 @@ Every contract carries a `## PII handling` section stating what personal data th
 | [`notion-employees.md`](./notion-employees.md) | Notion — Employees DB + Policies wiki (two objects, one contract by design, not an oversight of the one-system-per-contract convention — see file header) | `onboarder`, `people-ops` scopes |
 | [`gmail.md`](./gmail.md) | Gmail | `recruiter` scope (F1, F3, F4, F6, F8) |
 | [`calendar.md`](./calendar.md) | Google Calendar | `recruiter` scope (F1, F5, F8) |
-| [`slack.md`](./slack.md) | Slack | `recruiter` scope (F2, F7, F9) |
-| [`_template.md`](./_template.md) | (blank) | Fill this to add HRMS, WhatsApp, or any future system |
+| [`slack.md`](./slack.md) | Slack | `recruiter`, `onboarder`, `people-ops` scopes |
+| [`hrms.md`](./hrms.md) | HRMS — payroll/leave/attendance system of record (provider undecided, gate G14) | `people-ops` scope — read-only in P2 |
+| [`bgv.md`](./bgv.md) | Background verification vendor (undecided, gate G18) | `onboarder` scope |
+| [`_template.md`](./_template.md) | (blank) | Fill this to add WhatsApp or any future system |
 
 New integration = copy `_template.md`, fill every section, add a row above.

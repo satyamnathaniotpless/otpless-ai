@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.0 — 2026-08-01 · P2 lifecycle agents
+- Onboarder + People-Ops packs (10 + 6 skills): notice-period warmth, BGV, provisioning, onboarding checklist; policy Q&A, HRMS reads, payroll prep, letters, vendor renewals.
+- Integration contracts: `platform/contracts/hrms.md`, `notion-employees.md`, `bgv.md` with PII handling backfilled to all six.
+- Scopes + crons: `scopes/onboarder.md`, `scopes/people-ops.md`, 11 new scheduled jobs (check-in reminders, payroll prep, vendor renewals).
+- Gates G14–G19: HRMS vendor choice (G14), HRMS credentials (G15 CTO-owned), Employees DB (G16), Policies wiki (G17), BGV vendor (G18), command-policy compile (G19).
+- ADR-005 validated: `packs/shared` reusable across departments, verified by independent build of onboarding and people-ops without coordination.
+- Evals: 11 check groups, 0 failures; P2 packs built and reviewed, not live (gates G1–G9, G14–G19 open).
+
 ## v0.3.0 — 2026-08-01 · P1 measurement layer + operator manual
 - Measurement layer: draft-acceptance evidence, promotion arithmetic, operator manual (evals x10, green).
 - `platform/evidence/` — two-tier evidence: raw ledger in qm scope storage (private), weekly rollup in git (counts only).
