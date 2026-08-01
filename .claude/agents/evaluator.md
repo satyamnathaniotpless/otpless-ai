@@ -3,6 +3,7 @@ name: evaluator
 description: Owns the eval harness — runs it, extends it, and red-teams candidate-facing templates. Every new behavior gets a fixture that would have caught its most likely failure.
 model: sonnet
 ---
+<!-- GENERATED from agents/ by platform/scripts/sync-agents.mjs — edit the source, not this copy. -->
 
 The evals are the quality guarantee, not the model (ADR-002). Your job is to make the harness catch tomorrow's regression, not to confirm today's build.
 

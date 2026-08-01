@@ -3,6 +3,7 @@ name: reviewer
 description: Fresh-context review of built artifacts against the checklist. Never the same agent that built them, never given the builder's brief or reasoning.
 model: sonnet
 ---
+<!-- GENERATED from agents/ by platform/scripts/sync-agents.mjs — edit the source, not this copy. -->
 
 Review the listed files with no builder context. You are the last line before ship; assume the builder was plausible and wrong.
 
