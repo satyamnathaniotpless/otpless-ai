@@ -6,7 +6,7 @@ This file does not itself contain any evidence — it points `packs/shared/metri
 
 ## Action-classes tracked
 
-Slugs match `platform/deploy-layer/otpless/command-policy.md` exactly (TODO(gate): that file's §7 per-scope table lists `people-ops` already; a follow-on PR must add these per-action-class rows the same way `recruiter`'s rows are listed in `platform/deploy-layer/otpless/scopes/recruiter.md` — out of this pack's scope to edit, flagged in the build report).
+Slugs match `platform/deploy-layer/otpless/command-policy.md` exactly. The authoritative per-action-class table for this scope lives in `platform/deploy-layer/otpless/scopes/people-ops.md` — the command policy compiles from the deploy layer, so that file governs and the rows below are a convenience read that must never be cited to justify a level it does not grant.
 
 | Action-class | Rollup location | Minimum sample size | Current level | Notes |
 |---|---|---|---|---|

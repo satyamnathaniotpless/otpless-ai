@@ -13,7 +13,9 @@ Two not-yet-created Notion objects, one contract, because both are consumed by t
 - `notion-search`: locate an employee row or a policy page when the exact one isn't known (e.g. by name or topic keyword).
 - `notion-get-comments`: existing notes/discussion on an employee row or a policy page.
 
-**Citation requirement (hard rule, not a style preference):** every People-Ops answer to a policy question must name the exact page it was drawn from (title today; page ID once the wiki exists and `packs/people-ops/config/notion.md` records it). An answer with no fetch performed this turn has no citation and must not be given — the correct response is "I don't have a citation for that yet — escalating," not a best-effort synthesis from several partial matches.
+**Citation requirement (hard rule, not a style preference):** every People-Ops answer to a policy question must name the exact source it was drawn from. Note that the canonical source is `brain/people/` (ADR-003) and this wiki is its human-facing mirror — so the citation is the `brain/` file and its status in `brain/people/policies-index.md`, and this contract's role is the cross-check below, not the citation itself. An answer with no source named must not be given — the correct response is "I don't have a citation for that yet — escalating," not a best-effort synthesis from several partial matches.
+
+**Mirror-drift check.** Once the wiki exists, a page's `Status` and the git index's `Status` must agree. If they disagree, answer from neither and escalate: the mirror has drifted from canon, and serving a policy out of an inconsistent pair is how an employee gets told they have leave they do not have.
 
 **Draft pages are never quoted as approved policy.** If the only matching page carries a Draft status, People-Ops must say so explicitly ("the only guidance I found is in draft, not yet approved") and escalate to the accountable human rather than presenting draft content as settled policy. This applies regardless of how confident the draft content looks or how urgent the employee's question is.
 

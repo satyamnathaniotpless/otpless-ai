@@ -9,8 +9,14 @@ Source of truth for the Notion identifiers and schema People-Ops skills (`../hrm
 | Item | ID | Status |
 |---|---|---|
 | Employees DB | TODO(gate): not yet created — who: Founder (Notion workspace admin), gate G16, `docs/gates.md` | People-Ops reads only, to cross-reference against HRMS (`../config/hrms.md`) — Onboarder owns the write side |
-| Policies wiki | TODO(gate): not yet created — who: Founder (Notion workspace admin + initial policy authoring), gate G17, `docs/gates.md` | The sole citable source for policy Q&A (`../policy-qa`) — People-Ops is read-only against it, full stop |
+| Policies wiki | TODO(gate): not yet created — who: Founder (Notion workspace admin + initial policy authoring), gate G17, `docs/gates.md` | The human-facing **mirror** of `brain/people/`, not the canonical source (ADR-003). `../policy-qa` cites `brain/`; People-Ops is read-only against the wiki and uses it only as the cross-check described below |
 | Machine-user grant (People-Ops's own integration token, scoped to both) | TODO(gate): not yet issued — who: Founder, gates G16 + G17, `docs/gates.md` | Never the recruiting agent's or Onboarder's token |
+
+## Which policy source is canonical
+
+`brain/people/` is canonical; the Notion Policies wiki is a downstream mirror for humans to browse (ADR-003). `../policy-qa` therefore cites the `brain/` file and its approval status from `brain/people/policies-index.md` — not the wiki page — and that remains true after gate G17 closes.
+
+The wiki still matters once it exists, as a **disagreement detector**: if a wiki page's Status contradicts the index (wiki says Approved, index says DRAFT, or the reverse), that is not a tie to break by picking the more convenient one. It means the mirror has drifted from canon, which is itself a defect. The correct behavior is to answer from neither, say the sources disagree, and escalate — a policy an employee could act on must not be served out of an inconsistent pair.
 
 ## Employees DB — properties (read-only for this pack)
 

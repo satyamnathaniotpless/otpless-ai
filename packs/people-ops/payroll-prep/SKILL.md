@@ -41,6 +41,8 @@ Human action needed: enter into {HRMS} before {cutoff}.
 ```
 This skill never reports a payroll cycle "done" or "submitted" — only "packet ready for human entry" or "packet incomplete, see flags above." The output is a draft in every sense the trust ladder recognizes (`../config/agent.md`), even though it's an internal packet rather than an external send.
 
+**Channel restriction.** The packet carries per-employee compensation-adjacent detail — loss-of-pay days, exit dates, reimbursement amounts — which is among the most sensitive data this agent handles. It goes to the accountable human privately (email or an access-controlled document), never to a Slack channel and never to a DM. Where the standup or a cron surfaces this work, it surfaces **counts and urgency only** ("payroll packet ready, 3 changes, cutoff Thursday") — never a name attached to a payroll change, and never a figure. Per `../config/playbook.md`'s PII rule, and for the same reason as `../hrms-query`: a Slack DM is retained, exportable, and admin-readable.
+
 ## Failure behavior
 
 - Cutoff date not yet configured → state that plainly, flag as a gate to the accountable human, do not infer a date.

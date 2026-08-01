@@ -32,6 +32,8 @@ An employee asks about their own leave balance, attendance record, or expense cl
 
 ## Output contract
 
+**Channel restriction — this governs every output below.** Per `../config/playbook.md`'s PII rule, an HRMS field value never goes to Slack, **including a direct message**. A DM feels private and is not: it is retained, exportable, and readable by a workspace admin, which is exactly the access-control property leave and attendance data must not lose. So when this skill is reached from Slack, it does not answer with the figure — it replies that the answer is being sent to the employee's own mailbox and routes the figure there, or asks the employee to check the HRMS directly. Slack gets at most the employee's name and a one-line status. The formats below are the *email/document-channel* shapes.
+
 Opens with what was checked:
 ```
 Checked: HRMS ({provider, or "not yet connected"})
