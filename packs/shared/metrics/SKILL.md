@@ -32,7 +32,8 @@ The trust ladder (`packs/shared/trust-ladder/SKILL.md`) promotes on "≥95% of d
 4. **Pull `current_level` and `incidents_in_window`** from the command policy / incident log, not from the ledger — the ledger only ever proves acceptance, never levels or incidents.
 5. **Write the rollup** to the agent's rollup file under `platform/evidence/` following the schema in `platform/evidence/README.md`. Only counts, rates, dates, and action-class labels may appear — never a name, id, email address, or content excerpt. If a field could identify a person, it does not go in the rollup; leave it out rather than redact it partially.
 6. **A rollup is generated, never hand-edited.** Append the new window as a new entry; do not overwrite or "correct" a prior week's committed rollup by hand — fix the ledger/pipeline and regenerate instead.
-7. **Gaps do not roll forward.** If the ledger has a hole for part of the window (agent downtime, qm outage), do not backfill by estimating — extend the window until enough evidence-bearing days exist, per the trust-ladder's failure behavior. A rollup with a known gap must say so, not silently shrink its sample.
+7. **When a class clears its gate, open the promotion PR — this skill owns that step**, because it is the one holding the evidence. Check the fresh rollup against the gate table in `packs/shared/trust-ladder/SKILL.md`; if and only if every cell clears, open a PR against `platform/deploy-layer/otpless/command-policy.md` citing the rollup file, window, sample size, and rate. If any cell fails, open nothing and report which cell fell short and by how much. Never self-merge — a human merges promotions (ADR-004). Playbook/template improvements are a different PR from a different skill (`packs/shared/retro/SKILL.md`); do not combine them, so a human is never asked to approve a tone change and an autonomy increase in one review.
+8. **Gaps do not roll forward.** If the ledger has a hole for part of the window (agent downtime, qm outage), do not backfill by estimating — extend the window until enough evidence-bearing days exist, per the trust-ladder's failure behavior. A rollup with a known gap must say so, not silently shrink its sample.
 
 ## Output contract
 
@@ -40,6 +41,7 @@ The trust ladder (`packs/shared/trust-ladder/SKILL.md`) promotes on "≥95% of d
 - One rollup update per agent per weekly cycle in `platform/evidence/`, matching the schema in `platform/evidence/README.md`, containing counts/rates/dates/action-class labels only.
 - Every rollup row states its `evidence_status` explicitly; a class below minimum sample never reports a bare rate.
 - Zero fields anywhere in the rollup capable of identifying a person.
+- A promotion PR exists for exactly those action-classes whose fresh rollup clears every cell of the gate, and for no others; each cites its rollup file, window, sample, and rate. None is ever self-merged.
 
 ## Failure behavior
 

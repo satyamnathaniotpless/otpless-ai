@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.3.0 — 2026-08-01 · P1 measurement layer + operator manual
+- Measurement layer: draft-acceptance evidence, promotion arithmetic, operator manual (evals x10, green).
+- `platform/evidence/` — two-tier evidence: raw ledger in qm scope storage (private), weekly rollup in git (counts only).
+- `packs/shared/metrics/SKILL.md` — classifies drafts into four buckets, generates rollup, opens promotion PRs when gates clear.
+- `packs/shared/trust-ladder/SKILL.md` and `packs/shared/retro/SKILL.md` — updated to consume evidence rollup; promotion and playbook PRs are deliberate separate reviews.
+- `platform/deploy-layer/otpless/crons.md` — two new rows: `recruit-watch-reply` (F9 reply watch) and `recruit-evidence-rollup` (Sunday 21:00 IST, ordered before retro).
+- `docs/OPERATING_RECRUITER.md` — operator's manual: daily loop, all 10 recruiting skills, config-only changes, known limitations.
+- Evals: 8 → 10 check groups (promotion-gate arithmetic with boundary cases, evidence-rollup PII guard, backup-artifact guard).
+
 ## v0.2.0 — 2026-08-01 · P0 deployment-ready
 - Build team: 7 subagent roles (architect, builder, reviewer, evaluator, integrator, librarian, deployer) in `agents/`, generated to `.claude/agents/`.
 - `platform/contracts/` — integration contracts for Notion, Gmail, Calendar, Slack + `_template.md`.

@@ -20,7 +20,9 @@ We adopt [yc-software/qm](https://github.com/yc-software/qm) (MIT) as the harnes
 | `BOOTSTRAP_PROMPT.md` | The prompt a human pastes into a Claude cloud agent to build + maintain this, 24×7 |
 | `docs/` | PRDs (master + recruiting), ADRs, deploy runbook |
 | `docs/gates.md` | Living human-gate ledger: 13 gates (G1–G13), each with accountable owner and unblock checklist |
+| `docs/OPERATING_RECRUITER.md` | Operator manual: daily loop, all 10 recruiting skills, config-only changes, known limitations |
 | `platform/contracts/` | Integration contracts for Notion, Gmail, Calendar, Slack — consumed by skills; `_template.md` for new connectors |
+| `platform/evidence/` | Draft-acceptance evidence: README (schema, formula, promotion decision table), `_rollup-template.md` for weekly rollups (counts only) |
 | `platform/scripts/` | Deployment automation: bootstrap-qm.sh (preflight + provisioning), verify-deployment.md (checklist) |
 | `platform/deploy-layer/otpless/` | Everything org-specific for the qm deployment (config, command policy, sandbox additions) |
 | `packs/shared/` | Generic agent-infrastructure skill pack: identity, standup, retro, trust ladder — every agent imports this |
@@ -42,6 +44,7 @@ We adopt [yc-software/qm](https://github.com/yc-software/qm) (MIT) as the harnes
 - [x] Company brain seed
 - [x] Eval harness v1 (structure, template lint, rating fixtures)
 - [x] Deployment-ready: contracts, scopes/crons as data, gate ledger, bootstrap preflight, evals x8
+- [x] Measurement layer: draft-acceptance evidence, promotion arithmetic, operator manual (evals x10)
 - [ ] qm deployment live — blocked on gates G1–G9 (see `docs/gates.md`)
 - [ ] Recruiter agent on qm, trust ladder L0 → L1
 - [ ] Onboarder + People-Ops agents (P2)

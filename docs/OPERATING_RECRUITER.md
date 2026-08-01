@@ -28,7 +28,7 @@ Everything else the agent may or may not do for a given action right now is a fu
 d) draft   s) send   e) edit — tell me what to change   ?) something else
 ```
 
-Pick `d` to leave it queued for later, `e` to redirect it, `s` only when you mean to approve it now. This prompt appears identically in `packs/recruiting/outreach/SKILL.md`, `reply/SKILL.md`, `reject/SKILL.md`, `schedule/SKILL.md`, and `review-applicants/SKILL.md` — it is not skill-specific phrasing, it is the approval gate.
+Pick `d` to leave it queued for later, `e` to redirect it, `s` only when you mean to approve it now. This exact wording appears in `packs/recruiting/outreach/SKILL.md`, `reply/SKILL.md`, `reject/SKILL.md`, and `schedule/SKILL.md`. `review-applicants/SKILL.md` offers the same four choices with wording specific to what it is gating (`d` leaves the recommendation in Notes without a stage change; `s` applies the stage change and flags). The letters and their meaning are the constant — it is the approval gate, not skill-specific phrasing.
 
 **Where approval actually happens.** Answering `s` is not the approval mechanism itself — the authorization event is recorded by qm's own command-policy gate, not by anything in Slack. `docs/ADRS.md` ADR-006 is explicit that Slack is a notification and discussion surface only: a Slack emoji reaction is not observable by the agent and is not an audit trail. If you see a "👍-to-act" shorthand anywhere in the PRDs, that describes the desired ergonomics (one gesture, in Slack), not how approval is currently wired — today, approval is the explicit `s`/`e` reply qm's gate captures, full stop.
 
