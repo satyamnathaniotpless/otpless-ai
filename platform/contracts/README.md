@@ -27,6 +27,7 @@ Every contract carries a `## PII handling` section stating what personal data th
 | [`slack.md`](./slack.md) | Slack | `recruiter`, `onboarder`, `people-ops` scopes |
 | [`hrms.md`](./hrms.md) | HRMS — payroll/leave/attendance system of record (provider undecided, gate G14) | `people-ops` scope — read-only in P2 |
 | [`bgv.md`](./bgv.md) | Background verification vendor (undecided, gate G18) | `onboarder` scope |
-| [`_template.md`](./_template.md) | (blank) | Fill this to add WhatsApp or any future system |
+| [`whatsapp.md`](./whatsapp.md) | WhatsApp Business API — candidate/employee messaging channel (no MCP today; account/template/infra decisions undecided, gates G20–G22) | `recruiter`, `onboarder` scopes (drafted text only until an MCP exists) |
+| [`_template.md`](./_template.md) | (blank) | Fill this to add any future system |
 
 New integration = copy `_template.md`, fill every section, add a row above.
