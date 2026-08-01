@@ -1,5 +1,13 @@
 # OTPLESS AI Workforce Platform
 
+> **Do not run `fly launch` (or any source-build deploy) against this repository.** It fails with
+> *"Could not find a Dockerfile, nor detect a runtime or framework from source code"* — correctly.
+> This repo is skill packs, config, and docs; it contains no service, and it never will.
+>
+> qm does not build from source. It pulls immutable image digests and orchestrates the Fly apps
+> itself. The deployment lives in a **separate directory** created by `qm init`, and goes live via
+> `qm up`. Start at `docs/RUNBOOK_DEPLOY.md` §2 — not at Fly's quickstart.
+
 The custom agent harness and agent workforce for OTPLESS. One platform, hundreds of scoped agents over time, organized like a company: departments → agents → skills → config. HR/People is department #1 (greenfield, urgent, high-volume); the Recruiter agent is employee #1.
 
 **This is permanent infrastructure.** The current 7-hire sprint is the commissioning run. The platform's product is: any new role, workflow, or department becomes a config change plus a skill pack — never a new system.
