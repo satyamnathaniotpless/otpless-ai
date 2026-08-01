@@ -1,4 +1,7 @@
 <!-- Purpose: template for any new people policy doc — copy this, fill it, keep Status: DRAFT until the founder approves. -->
+<!-- POLICY-STATUS: DRAFT -->
+
+> ⚠️ **DRAFT — NOT APPROVED. Do not cite to employees, or act on, as if this were live policy.** Flip both this banner and the `<!-- POLICY-STATUS -->` comment above to `APPROVED` in the same commit that flips `people/policies-index.md`, never before.
 
 # {Policy Name}
 

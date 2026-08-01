@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Purpose: zero-dependency eval harness — STRUCTURE, SKILL SHAPE, LINT, NEVER-DELEGATED
 // COVERAGE, GATE HYGIENE, SECRET-SHAPE GUARD, CROSS-REFERENCE, RATING FIXTURES, PROMOTION
-// GATE, and EVIDENCE ROLLUP PII GUARD checks; exits non-zero on any failure.
+// GATE, EVIDENCE ROLLUP PII GUARD, and POLICY APPROVAL STATUS checks; exits non-zero on any
+// failure.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -101,7 +102,14 @@ const COMMAND_POLICY_PATH = "platform/deploy-layer/otpless/command-policy.md";
 
 const REQUIRED_SKILL_SECTIONS = ["trigger", "inputs", "process", "output contract", "failure behavior"];
 
-const PII_ALLOWED_ADDRESS = "recruiting@otpless.com";
+// Agent mailboxes are infrastructure, not personal data — master PRD §6 provisions one per
+// agent (recruiting@, people@ …). A HUMAN's address in a pack is still a defect. Add an entry
+// here only when a new agent gets its own mailbox; never to silence a human address.
+const PII_ALLOWED_ADDRESSES = [
+  "recruiting@otpless.com",
+  "people@otpless.com",
+  "onboarding@otpless.com",
+];
 const PII_PATTERN = /[a-z0-9._%+-]+@(gmail\.com|otpless\.com)/gi;
 
 let failures = 0;
@@ -244,12 +252,12 @@ for (const name of CANDIDATE_FACING_SKILLS) {
   row(hasDisclosure && hasDraft, rel, `disclosure=${hasDisclosure} draft=${hasDraft}`);
 }
 
-console.log(`\n-- PII guard: no @gmail.com / @otpless.com other than ${PII_ALLOWED_ADDRESS} --`);
+console.log(`\n-- PII guard: no @gmail.com / @otpless.com other than agent mailboxes (${PII_ALLOWED_ADDRESSES.join(", ")}) --`);
 let piiHits = 0;
 for (const rel of allPackMd) {
   const text = readFile(rel);
   const matches = text.match(PII_PATTERN) || [];
-  const bad = matches.filter((m) => m.toLowerCase() !== PII_ALLOWED_ADDRESS);
+  const bad = matches.filter((m) => !PII_ALLOWED_ADDRESSES.includes(m.toLowerCase()));
   if (bad.length > 0) {
     row(false, `${rel} contains disallowed address(es)`, [...new Set(bad)].join(", "));
     piiHits++;
@@ -631,6 +639,62 @@ if (evidencePiiHits === 0) {
     true,
     `no PII-shaped values or undocumented fields found across ${evidenceFiles.length} file(s) under platform/evidence/`
   );
+}
+
+// ---------------------------------------------------------------------------
+console.log("\n=== 11. POLICY APPROVAL STATUS (brain/people/**) ===\n");
+
+// The People-Ops agent may only quote an APPROVED policy to an employee; quoting a draft
+// as settled policy is a guardrail violation, because an employee acts on the answer.
+// That rule is only as good as the marker it reads, so the marker is asserted here:
+// every policy doc carries an exact POLICY-STATUS token, and it must agree with the row
+// in policies-index.md, which the index itself declares authoritative.
+const POLICY_DIR = "brain/people";
+const STATUS_RE = /<!--\s*POLICY-STATUS:\s*(DRAFT|APPROVED)\s*-->/;
+const policyFiles = fs
+  .readdirSync(path.join(ROOT, POLICY_DIR))
+  .filter((f) => f.endsWith("-policy.md") || f === "policy-_template.md");
+
+const indexText = readFile(`${POLICY_DIR}/policies-index.md`);
+let policyHits = 0;
+
+for (const file of policyFiles) {
+  const rel = `${POLICY_DIR}/${file}`;
+  const text = readFile(rel);
+  const m = text.match(STATUS_RE);
+  if (!m) {
+    row(false, `${rel} has no POLICY-STATUS marker`, "an unmarked policy can be mistaken for approved");
+    policyHits++;
+    continue;
+  }
+  const status = m[1];
+  // A DRAFT must also carry the human-visible banner — the marker alone is invisible to
+  // anyone reading the rendered page rather than grepping it.
+  if (status === "DRAFT" && !/DRAFT\s*[—-]\s*NOT APPROVED/i.test(text)) {
+    row(false, `${rel} is DRAFT but lacks the visible NOT-APPROVED banner`, "marker present, human warning missing");
+    policyHits++;
+  }
+  // The template is the seed for future policies and has no index row of its own.
+  if (file === "policy-_template.md") {
+    if (status !== "DRAFT") {
+      row(false, `${rel} must default to DRAFT`, `found ${status} — every policy copied from it would start approved`);
+      policyHits++;
+    }
+    continue;
+  }
+  // Index row wins: the index declares itself authoritative, so disagreement is a defect.
+  const rowRe = new RegExp(`\\|[^\\n|]*\`people/${file.replace(".", "\\.")}\`[^\\n|]*\\|\\s*([A-Za-z]+)\\s*\\|`);
+  const indexRow = indexText.match(rowRe);
+  if (!indexRow) {
+    row(false, `${rel} has no row in policies-index.md`, "a policy absent from the index is invisible to the lookup path");
+    policyHits++;
+  } else if (indexRow[1].toUpperCase() !== status) {
+    row(false, `${rel} status disagrees with the index`, `file=${status} index=${indexRow[1]}`);
+    policyHits++;
+  }
+}
+if (policyHits === 0) {
+  row(true, `${policyFiles.length} policy file(s) carry a POLICY-STATUS marker consistent with policies-index.md`);
 }
 
 // ---------------------------------------------------------------------------

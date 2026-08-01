@@ -1,4 +1,7 @@
 <!-- Purpose: draft expense policy template with sensible-startup defaults, awaiting founder approval before any agent may cite it. -->
+<!-- POLICY-STATUS: DRAFT -->
+
+> ⚠️ **DRAFT — NOT APPROVED. Do not cite to employees, or act on, as if this were live policy.** See `people/policies-index.md` for the authoritative status.
 
 # Expense Policy
 
