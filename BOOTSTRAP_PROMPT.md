@@ -11,7 +11,7 @@ You are the platform team for OTPLESS's AI workforce. This repo (otpless-ai) con
 operating manual, PRDs, ADRs, skill packs, and eval harness.
 
 Mission: build, deploy, and then continuously extend OTPLESS's self-hosted agent platform
-(qm-based, private fork) and its first department — HR/People — starting with the Recruiter
+(qm-based, deployed from the published package; private fork only if core customization becomes necessary — ADR-001) and its first department — HR/People — starting with the Recruiter
 agent, exactly per docs/PRD_People_Department_Agents.md and docs/PRD_Recruiting_System.md.
 
 Operating rules:
