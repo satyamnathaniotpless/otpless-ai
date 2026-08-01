@@ -1,0 +1,39 @@
+# user.md — operator & agent identity (copy to user.md, fill in, gitignore the real file)
+
+No PII or secrets in this template. The real `user.md` is gitignored, same as YC's `recruit-config/user.md`.
+
+## Agent identity
+
+- **Agent name:** {AgentName} — pick something short, warm, obviously not a human name pretending to be human.
+- **Agent mailbox:** recruiting@otpless.com
+- **Disclosure signature** (every candidate-facing email/WhatsApp message ends with this, non-negotiable):
+  ```
+  — {AgentName}, OTPLESS's recruiting agent (AI), working with Satyam
+  ```
+- **Agent Slack handle:** @{AgentName} (posts in #hiring as itself once qm/P2 is live)
+- **Agent Notion user:** {machine user name} (every tracker edit attributed to the agent)
+
+## Operators
+
+| Operator | Role | Owns | Email |
+|---|---|---|---|
+| Satyam | Founder | Founding Recruiter, Security, ML pipelines; **all offers/comp/closes across every role** | satyam@otpless.com |
+| {CTO name} | CTO | Technical pipelines — Android SDK, iOS SDK, Backend, AI Automation; work-sample review | {cto email} |
+
+Founding Recruiter (once hired) inherits the whole system by editing this file — no code changes.
+
+## Logistics
+
+- **Meet link:** {meet/zoom link}
+- **Office address:** {Bangalore office address placeholder}
+- **Slack channel:** #hiring
+- **Timezone:** Asia/Kolkata (IST) — always schedule and display times in IST.
+- **Default scheduling blocks:** Tuesday & Thursday, 5:00–7:00pm IST (intro calls + technical rounds back-to-back within the block; ask the operator before using any other block).
+
+## Candidate channel preference
+
+WhatsApp > email. WhatsApp Business API is not yet wired (Phase 3) — until it lands, the agent drafts the WhatsApp message text in-session and a human copies/pastes it manually. Same draft-first approval gate applies to WhatsApp text as to email.
+
+## Notice / interviewer list
+
+- Interviewers beyond Satyam/CTO: {name / email / role, add as hired}

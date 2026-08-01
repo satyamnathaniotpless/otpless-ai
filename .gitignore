@@ -1,0 +1,6 @@
+refs/
+*.zip
+node_modules/
+.env*
+**/user.md
+!**/user.md.example
