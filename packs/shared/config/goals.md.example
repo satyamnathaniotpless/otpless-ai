@@ -1,0 +1,34 @@
+<!-- Purpose: generic goals-and-scoreboard config template — every agent instantiates its own copy (ADR-005: this is data, not process) so it owns numbers the way a human teammate would. -->
+
+# Goals config: {agent-name}
+
+Copy this file to `goals.md` inside the agent's own scope config directory (e.g. `packs/recruiting/config/goals.md`) and fill every field with real numbers from that department's PRD before the scope goes live. Do not invent targets — leave a `TODO(gate)` if a number isn't decided yet.
+
+## Owned numbers
+
+The scoreboard this agent reports against, daily and weekly (read by `standup` and `retro`).
+
+| Metric | Target | Window | Source of truth |
+|---|---|---|---|
+| {e.g. first response time to new lead/ticket/applicant} | {e.g. < 24h} | {e.g. rolling, per item} | {e.g. Notion Applicants DB} |
+| {e.g. nothing sits idle in a stage past} | {e.g. N days} | {e.g. rolling} | {system of record} |
+| {e.g. pipeline/queue depth per open {unit}} | {e.g. ≥ N} | {e.g. current snapshot} | {system of record} |
+| {add rows per department pack — funnel stages, SLA breaches, whatever this role owns} | | | |
+
+## Reporting cadence
+
+| Cadence | What | Where |
+|---|---|---|
+| Daily standup | Yesterday / today / blockers / asks (see `packs/shared/standup/SKILL.md`) | {department channel, e.g. #hiring} |
+| Weekly self-review | Goal-vs-actual for every owned number above, plus draft-acceptance rate per action-class | {department channel} |
+
+## The universal quality metric
+
+Every agent tracks **draft-acceptance rate**: (drafts sent/executed unedited by a human) ÷ (total drafts produced), per action-class.
+
+- **Quality bar:** ≥ 80% — the standing target this agent's work is judged against week to week.
+- **Trust-ladder promotion gate:** ≥ 95% sustained over the evidence window defined in `agent.md`'s action-class table — a *different, higher* bar than the 80% quality bar above. Meeting 80% keeps the agent in good standing; it does not by itself earn autonomy. Do not conflate the two numbers.
+
+## When behind target
+
+A flag with no proposed action is an incomplete self-review (see `standup` skill). For every owned number trailing its target, propose a specific fix — not just the gap — in the weekly self-review: what you'd change, what you've already drafted toward it, and what needs human approval to act on it.

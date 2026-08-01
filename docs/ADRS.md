@@ -33,3 +33,19 @@
 **Decision:** Role-specific and department-specific content is always data (config/playbook files instantiated from `_template.md` files), never process (skills). Opening a new role = one file in `packs/recruiting/config/jobs/`. A new department = a new pack importing `packs/shared`. A new agent = a qm scope + identity kit + goals file.
 
 **Why:** the 7-hire sprint is the commissioning run; the platform's product is marginal cost ≈ zero for the next role, agent, and department.
+
+## ADR-006 — Approval happens in qm's gate, never in a channel affordance
+
+**Decision:** Human approval of a drafted action is recorded by qm's own approval mechanism (command policy gate, surfaced in the web UI and via qm's Slack plugin). Slack is a *notification and discussion* surface, not an authorization surface. The PRD's "👍-to-act" shorthand (`PRD_Recruiting_System.md` §6) is retired as a mechanism and kept only as a description of the desired ergonomics: one gesture, in Slack, to approve.
+
+**Why:** two independent reasons, and either alone is sufficient. (1) Capability: the Slack MCP exposes message and thread text, not reactions — an emoji approval is not observable by the agent, so a system built on it would silently never fire, or worse, invite polling hacks. (2) Security: an approval is an authorization event and belongs where enforcement lives (ADR-004). A reaction is unauthenticated relative to our policy layer — anyone in the channel can add one, there is no record of *which* draft version was approved, and the audit trail is a Slack emoji. Approvals must be attributable, versioned to the exact content approved, and replayable in an incident review.
+
+**Consequences:** the trust ladder's evidence (ADR-004, and the rollup in `docs/plans/p1-recruiter-complete.md`) reads from qm's approval log, which is authoritative, rather than from channel scraping. Any future channel (WhatsApp, email) inherits the same rule: the channel carries the draft, qm carries the approval. If qm's Slack plugin later offers interactive buttons bound to its approval gate, that is the ergonomic win — still the gate, just a nicer button.
+
+## ADR-007 — The draft is the contract boundary; send capability is verified, never worked around
+
+**Decision:** Every skill's output contract ends at a **created draft**, in every channel, at every trust level. Whether the platform can then *send* that draft is a connector capability question answered at deploy time by `platform/scripts/verify-deployment.md`, not an assumption baked into skills. Where the connector cannot send (today: the Gmail MCP surface exposes draft/read/label operations and no send), the gap is recorded in the contract's "Capability gaps" section and closed by extending the MCP — never by a raw HTTP call, a headless browser, or a human's mailbox.
+
+**Why:** the discovery that we can draft but not send would, in a naively-built system, surface as a mystery failure at the worst moment — the first L1 auto-send after a promotion. Making the draft the universal boundary means the system's behavior is identical at L0 and L1 up to the final step, so promotion changes one gate and nothing else. It also means a missing capability degrades to "a human clicks send," which is exactly the L0 behavior we already run, rather than to an outage.
+
+**Consequences:** an action-class cannot be promoted to L1 until its channel's send capability is verified present and approval-gated — that verification is a precondition on the promotion PR, alongside the acceptance-rate evidence. `platform/contracts/*.md` carries the current truth per channel.

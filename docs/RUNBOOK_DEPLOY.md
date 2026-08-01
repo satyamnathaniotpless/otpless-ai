@@ -4,6 +4,8 @@ Everything an agent can't do alone lives here. Total human time: ~2–3 hours on
 
 ## 1. Human-gated prerequisites (do these once)
 
+Live status of every item below (owner, workaround, what's actually blocking): `docs/gates.md`. That table is the ledger; this list is the one-time reference.
+
 | # | Item | Who | Notes |
 |---|---|---|---|
 | 1 | Cloud account: Fly.io org (recommended for speed) or AWS | CTO | qm deploys into OUR account; nothing is hosted by third parties |
@@ -18,6 +20,8 @@ Everything an agent can't do alone lives here. Total human time: ~2–3 hours on
 | 10 | Provider: **Fly.io — DECIDED (2026-08-01)**, binding per deployment directory | CTO | Create the Fly.io org + billing; slug `otpless` is local, not globally unique |
 
 ## 2. Stand up qm (agent-executable once #1 is done)
+
+Run `platform/scripts/bootstrap-qm.sh` — it preflights every item in §1 (keyed to the gate ids in `docs/gates.md`), refuses to mutate anything if a check is missing, and only on `--apply` runs the sequence below.
 
 No source checkout needed. Create an organization-owned deployment repository that depends on the published package:
 
@@ -39,6 +43,8 @@ Merge `platform/deploy-layer/otpless/` from this repo into the deployment direct
 qm imports skill packs from git repos. Point the deployment at git@github.com:satyamnathaniotpless/otpless-ai.git — packs/shared and packs/recruiting. Create scope `recruiter` with the identity kit from `packs/shared/identity` and config from `packs/recruiting/config/` (fill `user.md` from `user.md.example`).
 
 ## 4. Verification checklist (agent-executable)
+
+Executable procedure (pass condition, synthetic fixture, and failure action per check): `platform/scripts/verify-deployment.md`.
 
 - [ ] Web UI reachable; founder + CTO sign in; scopes isolated
 - [ ] Slack: @agent responds in #hiring; standup cron fires 08:30 IST
