@@ -39,15 +39,17 @@ See `crons.md` for full schedule detail.
 
 ## Action-classes with current trust level
 
-| Action-class | Current level | Notes |
-|---|---|---|
-| Policy Q&A response (employee-facing) | L0 | Never answerable at all without a citation to a real Policies-wiki page (`platform/contracts/notion-employees.md`), regardless of level; candidate for L1 once 2 weeks of unedited-draft evidence exists |
-| Leave/attendance/expense-status query response | L0 | Read-only against HRMS; candidate for L1 as a routine, low-judgment class |
-| Letter draft (employment verification, address proof, ...) | L0 | Always requires a human signatory regardless of level — promotion affects draft-to-signatory speed, never removes the signature step |
-| Payroll input packet (to accountable human, ahead of HRMS cutoff) | L0 (internal coordination, not an external send) | Never promotes to an HRMS write — P2 hard scope limit per `platform/contracts/hrms.md`; revisit only after the HRMS provider decision (gate G14) and a written ADR |
-| Vendor renewal notice/reminder | L0 | Any spend/contract commitment is a human gate (CLAUDE.md autonomy & human gates) regardless of trust-ladder level |
-| HRMS write of any kind | **NOT IN SCOPE (P2)** | Not an action-class this scope performs at all — **Strict posture is the standing backstop** (`command-policy.md` §1/§7) for the day a write path is ever proposed; revisit only when Keka vs RazorpayX is decided (gate G14) and a written ADR supersedes this line |
-| Offers / comp / terminations / performance judgments / post-interview rejections / policy changes | NEVER DELEGATED | Hard deny, `command-policy.md` §4, all postures, all levels |
+The slug column is the canonical action-class vocabulary — it must match `packs/people-ops/config/evidence.md` exactly, and it is what the evidence rollup and any promotion PR cite (`./_template.md`). This scope's five tracked classes already matched 1:1 with `evidence.md`'s slugs — nothing invented or merged here.
+
+| Action-class | Slug | Current level | Notes |
+|---|---|---|---|
+| Policy Q&A response (employee-facing) | `policy_qa_response` | L0 | Never answerable at all without a citation to a real Policies-wiki page (`platform/contracts/notion-employees.md`), regardless of level; candidate for L1 once 2 weeks of unedited-draft evidence exists |
+| Leave/attendance/expense-status query response | `leave_attendance_query_response` | L0 | Read-only against HRMS; candidate for L1 as a routine, low-judgment class |
+| Letter draft (employment verification, address proof, ...) | `letter_draft` | L0 | Always requires a human signatory regardless of level — promotion affects draft-to-signatory speed, never removes the signature step |
+| Payroll input packet (to accountable human, ahead of HRMS cutoff) | `payroll_input_packet` | L0 (internal coordination, not an external send) | Never promotes to an HRMS write — P2 hard scope limit per `platform/contracts/hrms.md`; revisit only after the HRMS provider decision (gate G14) and a written ADR |
+| Vendor renewal notice/reminder | `vendor_renewal_notice` | L0 | Any spend/contract commitment is a human gate (CLAUDE.md autonomy & human gates) regardless of trust-ladder level |
+| HRMS write of any kind | n/a | **NOT IN SCOPE (P2)** | Not an action-class this scope performs at all, so no evidence accumulates — distinct from a never-delegated hard deny, which is a permanent policy rule rather than a pending-decision scope limit. **Strict posture is the standing backstop** (`command-policy.md` §1/§7) for the day a write path is ever proposed; revisit only when Keka vs RazorpayX is decided (gate G14) and a written ADR supersedes this line |
+| Offers / comp / terminations / performance judgments / post-interview rejections / policy changes | n/a | NEVER DELEGATED | Hard deny, `command-policy.md` §4, all postures, all levels |
 
 ## Accountable human
 

@@ -42,16 +42,18 @@ See `crons.md` for full schedule detail.
 
 ## Action-classes with current trust level
 
-| Action-class | Current level | Notes |
-|---|---|---|
-| Notice-period touchpoint (weekly warmth message) | L0 | Highest-volume class; candidate for L1 once 2 clean weeks of unedited-draft evidence exist (`packs/shared/metrics/SKILL.md`) |
-| BGV initiation / nudge | L0 | Vendor account gate (G18) blocks any real send regardless of level — see `packs/onboarding/config/vendors.md` |
-| Paperwork reminder | L0 | |
-| Provisioning request (devices/accounts to IT/Admin) | L0 | |
-| Day-one plan confirmation / #people post | L0 | Post-to-human-channel starts at L0 per `command-policy.md` §2 |
-| Buddy assignment proposal | L0 | Proposes only; a human confirms which employee's time gets committed |
-| 30/60/90 check-in scheduling | L0 | |
-| Offers / comp / terminations / performance judgments / post-interview rejections / policy changes | NEVER DELEGATED | Hard deny, `command-policy.md` §4, all postures, all levels — comp/offer questions raised during notice period are routed to a human, never answered |
+The slug column is the canonical action-class vocabulary — it must match this pack's `config/evidence.md` exactly, once that file exists, and it is what the evidence rollup and any promotion PR cite (`./_template.md`). **All seven slugs below were invented during this reconciliation pass**: `packs/onboarding/config/` has no `evidence.md` on disk at all (unlike every other pack's evidence config), so there was no existing vocabulary to reconcile against — see the phase report. Creating that file, using these exact slugs, is flagged there as follow-up work.
+
+| Action-class | Slug | Current level | Notes |
+|---|---|---|---|
+| Notice-period touchpoint (weekly warmth message) | `notice_period_touchpoint` | L0 | Highest-volume class; candidate for L1 once 2 clean weeks of unedited-draft evidence exist (`packs/shared/metrics/SKILL.md`) |
+| BGV initiation / nudge | `bgv_initiation_nudge` | L0 | Vendor account gate (G18) blocks any real send regardless of level — see `packs/onboarding/config/vendors.md` |
+| Paperwork reminder | `paperwork_reminder` | L0 | |
+| Provisioning request (devices/accounts to IT/Admin) | `provisioning_request` | L0 | |
+| Day-one plan confirmation / #people post | `day_one_plan_confirmation` | L0 | Post-to-human-channel starts at L0 per `command-policy.md` §2 |
+| Buddy assignment proposal | `buddy_assignment_proposal` | L0 | Proposes only; a human confirms which employee's time gets committed |
+| 30/60/90 check-in scheduling | `checkin_scheduling` | L0 | |
+| Offers / comp / terminations / performance judgments / post-interview rejections / policy changes | n/a | NEVER DELEGATED | Hard deny, `command-policy.md` §4, all postures, all levels — comp/offer questions raised during notice period are routed to a human, never answered |
 
 ## Accountable human
 

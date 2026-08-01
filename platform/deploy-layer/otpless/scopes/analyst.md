@@ -42,13 +42,15 @@ See `crons.md` for full schedule detail.
 
 Every action-class below starts at **L0** (drafts/internal-post only), with the same shared evidence layer as every other scope as its sole promotion path: the weekly evidence rollup (`packs/shared/metrics/SKILL.md`, ADR-008) feeds the ≥95%-unedited-over-the-window gate in `command-policy.md` §3. No analyst action-class inherits evidence from any other scope, and none skips the rollup.
 
-| Action-class | Current level | Notes |
-|---|---|---|
-| Weekly People report (funnel, time-in-stage, source ROI, headcount, attrition signals) | L0 | **Outputs are aggregate-only** — counts, rates, and trends, never a figure attributable to one candidate or employee; promotion candidate once 2 weeks of unedited-draft evidence exist |
-| Monthly deep-dive (comp-band drift vs market, deeper trend analysis) | L0 | Same aggregate-only rule; a comp-band comparison is band-level, never an individual's comp — comp disclosure of any kind is `command-policy.md` §4 never-delegated regardless of this scope's own trust level |
-| Data-hygiene fix proposal (Notion/HRMS spine) | L0 | Proposes a fix only ("N rows missing Source, propose backfill from X"); any Notion/HRMS write this proposal leads to is itself a write against that system's own contract and posture — this row governs the proposal, not the write |
-| Ad hoc metrics query response (headcount, pipeline depth, funnel snapshot, etc.) | L0 | Aggregate-only, same as the weekly report row |
-| Offers / comp (individual) / terminations / performance judgments / post-interview rejections / policy changes | NEVER DELEGATED | Hard deny, `command-policy.md` §4, all postures, all levels — the Analyst reports on comp **bands** in aggregate only; it never discloses, negotiates, or judges an individual's comp |
+The slug column is the canonical action-class vocabulary — it must match `packs/analytics/config/evidence.md` exactly, and it is what the evidence rollup and any promotion PR cite (`./_template.md`). This scope's four tracked classes already matched 1:1 with `evidence.md`'s slugs (that file was authored against this scope's eventual shape) — nothing invented or merged here.
+
+| Action-class | Slug | Current level | Notes |
+|---|---|---|---|
+| Weekly People report (funnel, time-in-stage, source ROI, headcount, attrition signals) | `weekly_people_report_post` | L0 | **Outputs are aggregate-only** — counts, rates, and trends, never a figure attributable to one candidate or employee; promotion candidate once 2 weeks of unedited-draft evidence exist |
+| Monthly deep-dive (comp-band drift vs market, deeper trend analysis) | `monthly_deepdive_post` | L0 | Same aggregate-only rule; a comp-band comparison is band-level, never an individual's comp — comp disclosure of any kind is `command-policy.md` §4 never-delegated regardless of this scope's own trust level |
+| Data-hygiene fix proposal (Notion/HRMS spine) | `data_hygiene_flag` | L0 | Proposes a fix only ("N rows missing Source, propose backfill from X"); any Notion/HRMS write this proposal leads to is itself a write against that system's own contract and posture — this row governs the proposal, not the write |
+| Ad hoc metrics query response (headcount, pipeline depth, funnel snapshot, etc.) | `ad_hoc_analysis_response` | L0 | Aggregate-only, same as the weekly report row |
+| Offers / comp (individual) / terminations / performance judgments / post-interview rejections / policy changes | n/a | NEVER DELEGATED | Hard deny, `command-policy.md` §4, all postures, all levels — the Analyst reports on comp **bands** in aggregate only; it never discloses, negotiates, or judges an individual's comp |
 
 ## Accountable human
 

@@ -29,11 +29,13 @@ See `./goals.md` for the full scoreboard — instantiates `packs/shared/config/g
 
 ## Action-class autonomy levels (trust ladder — see `packs/shared/trust-ladder/SKILL.md`)
 
-Level changes only via a merged PR against `platform/deploy-layer/otpless/command-policy.md`, never edited here directly as a shortcut.
+**`platform/deploy-layer/otpless/scopes/analyst.md` holds the authoritative action-class table** — the command policy compiles from the deploy layer, so that file governs and this one must not restate it. A duplicated promotion table drifts the moment one class is promoted and only one copy is updated. Every class starts at L0; level changes only via a merged PR against `platform/deploy-layer/otpless/command-policy.md`.
 
-Authoritative action-class list and current trust levels: an `analyst.md` file under `platform/deploy-layer/otpless/scopes/` (following the pattern in `platform/deploy-layer/otpless/scopes/_template.md`, alongside the existing `recruiter.md` and `people-ops.md`) — command policy compiles from the deploy layer, so that file is meant to be the source of truth. **It does not exist yet** — the `analyst` qm scope is P3 (`platform/deploy-layer/otpless/org-config.md` Scopes table, order 4) and this pack is built ahead of that scope being stood up. Until it exists, `./evidence.md` carries the proposed action-class table as this pack's own record, explicitly marked pending compilation — see that file. Do not maintain two divergent copies once the scope file lands; that file wins.
+The never-delegated row below is repeated deliberately: a reader of this file must never have to look elsewhere to learn what this agent may never do.
 
-Never-delegated (hard deny, every posture/level, all scopes — full six-class list, not a partial copy): `platform/deploy-layer/otpless/command-policy.md` §4 — offers, compensation, terminations, performance judgments, post-interview rejections, policy changes. This agent additionally never states a comp figure tied to a named person (comp is never-delegated at the individual level regardless of the aggregate band-drift analysis this pack does perform — see `./playbook.md`) and never names an individual as an attrition risk (a performance-adjacent judgment — see `../attrition-signals/SKILL.md`).
+| Action-class | Current level | Notes |
+|---|---|---|
+| Offers / comp / terminations / performance judgments / post-interview rejections / policy changes | NEVER DELEGATED | Hard deny, `command-policy.md` §4, all postures, all levels. This agent additionally never states a comp figure tied to a named person (comp is never-delegated at the individual level regardless of the aggregate band-drift analysis this pack does perform — see `./playbook.md`) and never names an individual as an attrition risk (a performance-adjacent judgment — see `../attrition-signals/SKILL.md`). |
 
 ## Standup / retro cadence
 

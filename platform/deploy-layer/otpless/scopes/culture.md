@@ -41,17 +41,21 @@ See `crons.md` for full schedule detail.
 
 Every action-class below starts at **L0** (drafts/internal-post only), with the same shared evidence layer as every other scope as its sole promotion path: the weekly evidence rollup (`packs/shared/metrics/SKILL.md`, ADR-008) feeds the ≥95%-unedited-over-the-window gate in `command-policy.md` §3. This scope and `analyst` sit closest to the never-delegated line of any launched scope — two rows below are hard-denied for this scope specifically, in addition to the org-wide list.
 
-| Action-class | Current level | Notes |
-|---|---|---|
-| Pulse-survey cycle (launch / nudge / close a survey window) | L0 | Reported results are aggregate participation/response-rate only — no individual response is ever attributed or quoted |
-| 1:1 cadence nudge (reminder that a manager/report pair is overdue) | L0 | Nudge only — no 1:1 conversation content is ever agent-visible, agent-summarized, or agent-authored |
-| Review-cycle orchestration (process: reminders, deadline tracking, form distribution) | L0 | **Process only.** The agent runs the calendar/checklist; a human writes every word of review content (master PRD §4 row 5) — see the hard-deny row below |
-| Anniversary recognition (shoutout draft, milestone tracking) | L0 | Draft only, same approval gate as every channel |
-| Offboarding checklist tracking | L0 | Checklist/process only |
-| Exit-interview scheduling (logistics only) | L0 | Scheduling only — see the hard-deny row below for the content itself |
-| **Review-cycle content** (writing, editing, or summarizing actual review text/ratings) | **NEVER DELEGATED (scope-specific)** | Humans write reviews; the agent runs the process, full stop (master PRD §4 row 5). This restates `command-policy.md` §4's "performance judgments" line as a standing scope rule, not a new exception to it |
-| **Exit-interview content** (interpreting, summarizing, or acting on transcript substance) | **NEVER DELEGATED (scope-specific)** | Structured intake only; **a human reviews every transcript** (master PRD §4 row 5). The agent may prepare the structured question list and handle scheduling logistics — it never reads a transcript's substance and reports or acts on it |
-| Offers / comp / terminations / performance judgments / post-interview rejections / policy changes | NEVER DELEGATED | Hard deny, `command-policy.md` §4, all postures, all levels |
+The slug column is the canonical action-class vocabulary — it must match `packs/culture/config/evidence.md` exactly, and it is what the evidence rollup and any promotion PR cite (`./_template.md`). Six of these rows already matched 1:1 with `evidence.md`'s slugs; **`peer_feedback_relay` was added to this table during this reconciliation pass** — `evidence.md` tracked it, this table did not. `evidence.md`'s `exit_interview_transcript_delivery` needs no row of its own here: it is marked non-evidence-eligible there and corresponds to the "Exit-interview content" hard-deny row below, not a promotable class.
+
+| Action-class | Slug | Current level | Notes |
+|---|---|---|---|
+| Pulse-survey cycle (launch / nudge / close a survey window) | `pulse_survey_invite` | L0 | Reported results are aggregate participation/response-rate only — no individual response is ever attributed or quoted |
+| 1:1 cadence nudge (reminder that a manager/report pair is overdue) | `one_on_one_nudge` | L0 | Nudge only — no 1:1 conversation content is ever agent-visible, agent-summarized, or agent-authored |
+| Review-cycle orchestration (process: reminders, deadline tracking, form distribution) | `review_cycle_reminder` | L0 | **Process only.** The agent runs the calendar/checklist; a human writes every word of review content (master PRD §4 row 5) — see the hard-deny row below |
+| Peer feedback relay (delivering human-authored feedback text between parties) | `peer_feedback_relay` | L0 | Per-instance content is human-authored, not agent-composed — do not propose above L0 without an explicit human decision regardless of rate, same reasoning as recruiting's `outreach_send` |
+| Anniversary recognition (shoutout draft, milestone tracking) | `anniversary_message` | L0 | Draft only, same approval gate as every channel |
+| Offboarding checklist tracking | `offboarding_checklist_nudge` | L0 | Checklist/process only |
+| Exit-interview scheduling (logistics only) | `exit_interview_invite` | L0 | Scheduling only — see the hard-deny row below for the content itself |
+| **Review-cycle content** (writing, editing, or summarizing actual review text/ratings) | n/a | **NEVER DELEGATED (scope-specific)** | Humans write reviews; the agent runs the process, full stop (master PRD §4 row 5). This restates `command-policy.md` §4's "performance judgments" line as a standing scope rule, not a new exception to it |
+| Exit-interview transcript delivery (private, one-directional handoff of the verbatim transcript to the accountable human) | `exit_interview_transcript_delivery` | L0, permanently | Not evidence-eligible and never promoted: it is a private handoff, not a routine send whose speed a promotion would improve. Delivering it faster without a human reading it is the failure, not the goal. |
+| **Exit-interview content** (interpreting, summarizing, or acting on transcript substance) | n/a | **NEVER DELEGATED (scope-specific)** | Structured intake only; **a human reviews every transcript** (master PRD §4 row 5). The agent may prepare the structured question list and handle scheduling logistics — it never reads a transcript's substance and reports or acts on it |
+| Offers / comp / terminations / performance judgments / post-interview rejections / policy changes | n/a | NEVER DELEGATED | Hard deny, `command-policy.md` §4, all postures, all levels |
 
 ## Accountable human
 

@@ -18,6 +18,9 @@ Until that compilation happens, no promotion can cite a policy row that exists, 
 | `outreach_send` | `platform/evidence/recruiter/` | 20 | L0 | Personalisation is the whole value; a template that passes lint can still be wrong for a person. Do not propose above L0 without an explicit human decision, regardless of rate. |
 | `applied_stage_rejection` | `platform/evidence/recruiter/` | 20 | L0 | L2-eligible at the earliest (4-week clean window). Only pre-screen rejections — anything after a human has met the candidate is never-delegated. |
 | `stage_advance` | `platform/evidence/recruiter/` | 20 | L0 | L2-eligible. Advance-to-onsite is excluded and stays human (PRD §12.3). |
+| `candidate_qa_reply` | `platform/evidence/recruiter/` | 20 | L0 | Added during the scope-reconciliation pass — `scopes/recruiter.md` carried this row, this file did not. Standard Q&A answers only (`../reply/SKILL.md`); anything flagged to the operator (visa/legal) never reaches this ledger as a resolved draft. |
+| `slack_digest_post` | `platform/evidence/recruiter/` | 20 | L0 | Added during the scope-reconciliation pass — the morning digest and any other #hiring/#people post (`../recruit-watch/SKILL.md`). Post-to-human-channel starts at L0 per `command-policy.md` §2. |
+| `notion_record_write` | `platform/evidence/recruiter/` | 20 | L0 | Added during the scope-reconciliation pass — stage/flag/scorecard writes to the Applicants DB. Internal write, not a send, but still an action-class per `packs/shared/metrics/SKILL.md`'s definition (a drafted action with a resolution); verified per `platform/contracts/notion.md`. |
 | Offers / comp / terminations / performance judgments / post-interview rejections / policy changes | n/a | n/a | NEVER DELEGATED | No evidence accumulates. These never enter the ladder at any rate (`packs/shared/trust-ladder/SKILL.md`). |
 
 Minimum sample size is the platform default of 20 (`platform/evidence/README.md`). It may be raised per class here, never lowered.
@@ -48,3 +51,6 @@ Rationale for drawing it here: recruiting drafts are short and mostly logistical
 | `outreach_send` | L0 | — | — |
 | `applied_stage_rejection` | L0 | — | — |
 | `stage_advance` | L0 | — | — |
+| `candidate_qa_reply` | L0 | — | — |
+| `slack_digest_post` | L0 | — | — |
+| `notion_record_write` | L0 | — | — |

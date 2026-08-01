@@ -706,6 +706,100 @@ if (policyHits === 0) {
 }
 
 // ---------------------------------------------------------------------------
+console.log("\n=== 12. PACK / SCOPE ACTION-CLASS AGREEMENT ===\n");
+
+// Two checks that only exist because both failures actually happened.
+//
+// (a) Every department pack needs its own config set. packs/onboarding shipped without an
+//     evidence.md, so the Onboarder had no declared action-classes, no light-edit threshold,
+//     and no rollup destination — an agent with no measurable promotion path, which nothing
+//     noticed because nothing looked.
+//
+// (b) A scope file and its pack's evidence.md must name the same action-classes with the
+//     same slugs. The rollup, the ledger, and the promotion PR all cite the slug; if the two
+//     layers disagree, a promotion cites a class that does not exist on the other side and
+//     the citation chain breaks silently. That is the exact failure ADR-008 exists to
+//     prevent, and the recruiter's two files had already drifted three slugs in each
+//     direction before anyone compared them.
+const SCOPE_TO_PACK = {
+  recruiter: "recruiting",
+  onboarder: "onboarding",
+  "people-ops": "people-ops",
+  analyst: "analytics",
+  culture: "culture",
+};
+const REQUIRED_PACK_CONFIG = ["agent.md", "goals.md", "playbook.md", "evidence.md"];
+const SLUG_RE = /`([a-z][a-z0-9_]*)`/g;
+
+// Evidence-schema vocabulary legitimately appears in evidence.md tables (bucket names,
+// status values, field names) and is not an action-class. Excluded from the comparison so
+// the check flags real disagreements rather than schema words.
+const NOT_ACTION_CLASSES = new Set([
+  "sent_unedited",
+  "sent_light_edit",
+  "sent_rewrite",
+  "evidence_status",
+  "insufficient_evidence",
+  "acceptance_rate",
+  "window_start",
+  "window_end",
+  "window_days",
+  "generated_at",
+  "generated_by",
+  "known_gaps",
+  "current_level",
+  "incidents_in_window",
+  "action_class",
+  "min_cell_size",
+]);
+
+function slugsIn(text) {
+  // Only pull slugs out of table rows, so prose mentions elsewhere in the file don't count.
+  const out = new Set();
+  for (const line of text.split("\n")) {
+    if (!line.trim().startsWith("|")) continue;
+    for (const m of line.matchAll(SLUG_RE)) {
+      if (m[1].includes("_") && !NOT_ACTION_CLASSES.has(m[1])) out.add(m[1]); // snake_case slugs only
+    }
+  }
+  return out;
+}
+
+let agreementHits = 0;
+for (const [scope, pack] of Object.entries(SCOPE_TO_PACK)) {
+  const scopePath = `platform/deploy-layer/otpless/scopes/${scope}.md`;
+  if (!exists(scopePath)) {
+    row(false, `${scopePath} missing`, `scope ${scope} has no scope file`);
+    agreementHits++;
+    continue;
+  }
+  for (const cfg of REQUIRED_PACK_CONFIG) {
+    const cfgPath = `packs/${pack}/config/${cfg}`;
+    if (!exists(cfgPath)) {
+      row(false, `${cfgPath} missing`, `every department pack needs its own ${cfg}`);
+      agreementHits++;
+    }
+  }
+  const evPath = `packs/${pack}/config/evidence.md`;
+  if (!exists(evPath)) continue;
+  const scopeSlugs = slugsIn(readFile(scopePath));
+  const evSlugs = slugsIn(readFile(evPath));
+  const onlyScope = [...scopeSlugs].filter((s) => !evSlugs.has(s));
+  const onlyEvidence = [...evSlugs].filter((s) => !scopeSlugs.has(s));
+  if (onlyScope.length || onlyEvidence.length) {
+    row(
+      false,
+      `${scope}: scope file and pack evidence.md disagree on action-class slugs`,
+      `only in scope: [${onlyScope.join(", ")}] · only in evidence: [${onlyEvidence.join(", ")}]`
+    );
+    agreementHits++;
+  }
+}
+if (agreementHits === 0) {
+  row(true, `${Object.keys(SCOPE_TO_PACK).length} scope(s) agree with their pack's config and action-class slugs`);
+}
+
+// ---------------------------------------------------------------------------
 console.log("\n=== SUMMARY ===\n");
 console.log(`Total failures: ${failures}`);
 

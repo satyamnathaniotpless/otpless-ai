@@ -20,12 +20,12 @@ Every contract carries a `## PII handling` section stating what personal data th
 
 | Contract | System | Consumed by |
 |---|---|---|
-| [`notion.md`](./notion.md) | Notion (ATS / People spine) | `recruiter` scope (F1, F2, F5, F7, F8, F9) |
-| [`notion-employees.md`](./notion-employees.md) | Notion — Employees DB + Policies wiki (two objects, one contract by design, not an oversight of the one-system-per-contract convention — see file header) | `onboarder`, `people-ops` scopes |
+| [`notion.md`](./notion.md) | Notion (ATS / People spine) | `recruiter` scope (F1, F2, F5, F7, F8, F9); `analyst` scope (funnel/time-in-stage/source-ROI reads, read-only) |
+| [`notion-employees.md`](./notion-employees.md) | Notion — Employees DB + Policies wiki (two objects, one contract by design, not an oversight of the one-system-per-contract convention — see file header) | `onboarder`, `people-ops` scopes; `analyst` scope (headcount/attrition reads, read-only); `culture` scope (anniversary/review-cycle/offboarding metadata, read/checklist-write) |
 | [`gmail.md`](./gmail.md) | Gmail | `recruiter` scope (F1, F3, F4, F6, F8) |
 | [`calendar.md`](./calendar.md) | Google Calendar | `recruiter` scope (F1, F5, F8) |
-| [`slack.md`](./slack.md) | Slack | `recruiter`, `onboarder`, `people-ops` scopes |
-| [`hrms.md`](./hrms.md) | HRMS — payroll/leave/attendance system of record (provider undecided, gate G14) | `people-ops` scope — read-only in P2 |
+| [`slack.md`](./slack.md) | Slack | `recruiter`, `onboarder`, `people-ops`, `analyst`, `culture` scopes |
+| [`hrms.md`](./hrms.md) | HRMS — payroll/leave/attendance system of record (provider undecided, gate G14) | `people-ops` scope — read-only in P2; `analyst` scope — read-only (headcount/comp-band cross-reference) |
 | [`bgv.md`](./bgv.md) | Background verification vendor (undecided, gate G18) | `onboarder` scope |
 | [`whatsapp.md`](./whatsapp.md) | WhatsApp Business API — candidate/employee messaging channel (no MCP today; account/template/infra decisions undecided, gates G20–G22) | `recruiter`, `onboarder` scopes (drafted text only until an MCP exists) |
 | [`_template.md`](./_template.md) | (blank) | Fill this to add any future system |

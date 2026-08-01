@@ -31,9 +31,12 @@
 
 ## Action-classes with current trust level
 
-| Action-class | Current level | Notes |
-|---|---|---|
-| {e.g. Scheduling confirmations} | L0 | Per `command-policy.md` §2/§3 |
+Add a `Slug` column alongside the prose name. The slug is the canonical action-class vocabulary — it must match this pack's `config/evidence.md` exactly (take it from there where a row already exists; invent or merge on conflict and record why, same as `evidence.md` itself notes), and it is what the evidence rollup and a promotion PR cite (ADR-008). Never-delegated rows get no slug — they never enter the ladder — mark them `n/a`.
+
+| Action-class | Slug | Current level | Notes |
+|---|---|---|---|
+| {e.g. Scheduling confirmations} | `{e.g. scheduling_confirmation}` | L0 | Per `command-policy.md` §2/§3 |
+| {e.g. Offers / comp / ...} | n/a | NEVER DELEGATED | Per `command-policy.md` §4 |
 
 ## Accountable human
 

@@ -2,23 +2,23 @@
 
 # Evidence config: People Analyst
 
-This file does not itself contain any evidence — it points `packs/shared/metrics/SKILL.md` at what to measure and where to write it. The ledger lives in qm scope storage (never here, never git); the rollup lives under `platform/evidence/` in a per-scope subdirectory (generated, never hand-edited).
+This file does not itself contain any evidence — it points `packs/shared/metrics/SKILL.md` at what to measure and where to write it. The ledger lives in qm scope storage (never here, never git); the rollup lives in `platform/evidence/analyst/` (generated, never hand-edited).
 
 ## Action-classes tracked
 
-The authoritative per-action-class table for this scope is meant to live in an `analyst.md` file under `platform/deploy-layer/otpless/scopes/` (the pattern in `platform/deploy-layer/otpless/scopes/_template.md`) — **that file does not exist yet**, because the `analyst` qm scope is P3 and has not been stood up (`platform/deploy-layer/otpless/org-config.md` Scopes table, order 4). Gate G19 (`docs/gates.md`) already tracks "compile per-action-class rows into command-policy.md at deployment time" generically, so this is the same pending-compilation state every other scope started in, not a new gap. Until compiled, no promotion can cite a policy row that exists, so **no promotion can happen** — correct, since the scope has not run.
+The authoritative per-action-class table for this scope lives in `platform/deploy-layer/otpless/scopes/analyst.md` — the command policy compiles from the deploy layer, so that file governs and the rows below are a convenience read that must never be cited to justify a level it does not grant.
+
+`platform/deploy-layer/otpless/command-policy.md` does not yet carry named per-action-class rows; they compile in at deployment (gate G19). No promotion can cite a row that does not exist, so nothing here is promotable yet — the correct state, since the agent has not run and no evidence exists.
 
 | Action-class | Rollup location | Minimum sample size | Current level | Notes |
 |---|---|---|---|---|
-| `weekly_people_report_post` | a per-scope subdirectory under `platform/evidence/` (not yet created — see below) | 20 | L0 | Slack canvas/message draft to #people; aggregate-safe content, but promotion still runs on evidence, never on content-safety (`./playbook.md`) |
-| `monthly_deepdive_post` | (same, not yet created) | 20 | L0 | Lower natural volume (12/year) — will take longer to clear the 20-draft floor than weekly-cadence classes; report `insufficient_evidence`, not a failing rate, until it does |
-| `data_hygiene_flag` | (same, not yet created) | 20 | L0 | Internal escalation to the record-owning agent/accountable human, not a leadership-facing send — still an action-class per `packs/shared/metrics/SKILL.md`'s definition (a drafted action with a resolution) |
-| `ad_hoc_analysis_response` | (same, not yet created) | 20 | L0 | On-demand Slack answers to a question outside the report cadence (e.g. "what's current headcount") |
+| `weekly_people_report_post` | `platform/evidence/analyst/` | 20 | L0 | Slack canvas/message draft to #people; aggregate-safe content, but promotion still runs on evidence, never on content-safety (`./playbook.md`) |
+| `monthly_deepdive_post` | `platform/evidence/analyst/` | 20 | L0 | Lower natural volume (12/year) — will take longer to clear the 20-draft floor than weekly-cadence classes; report `insufficient_evidence`, not a failing rate, until it does |
+| `data_hygiene_flag` | `platform/evidence/analyst/` | 20 | L0 | Internal escalation to the record-owning agent/accountable human, not a leadership-facing send — still an action-class per `packs/shared/metrics/SKILL.md`'s definition (a drafted action with a resolution) |
+| `ad_hoc_analysis_response` | `platform/evidence/analyst/` | 20 | L0 | On-demand Slack answers to a question outside the report cadence (e.g. "what's current headcount") |
 | Offers / comp / terminations / performance judgments / post-interview rejections / policy changes | n/a | n/a | NEVER DELEGATED | No evidence accumulates for these — they never enter the ladder regardless of any rate (`packs/shared/trust-ladder/SKILL.md`). This agent additionally never accumulates evidence toward promoting "naming an attrition risk" or "stating an individual's comp" as an action-class at all — those aren't drafts this pack is allowed to produce, at any level (see `../attrition-signals/SKILL.md`, `../comp-drift/SKILL.md`). |
 
 Minimum sample size defaults to 20 (`platform/evidence/README.md`); only raise it here per action-class, never lower it below 20.
-
-**Rollup directory gap.** `platform/evidence/recruiter/` and `platform/evidence/people-ops/` already exist as examples of the pattern; the equivalent subdirectory for this scope does not exist yet and is not created by this pack (`platform/` is out of this build's scope — see this phase's report). Creating it is a one-line follow-up for whoever stands up the `analyst` qm scope: a directory plus a `README.md` mirroring the two examples above.
 
 ## Light-edit threshold
 
@@ -29,7 +29,7 @@ Proposed starting point, not yet decided by a human — TODO(gate): who: Founder
 | Field | Value |
 |---|---|
 | Ledger (private, qm scope storage, never git) | `analyst` scope storage (once the scope exists) |
-| Rollup directory (git, counts only) | a per-scope subdirectory under `platform/evidence/` — not yet created, see above |
+| Rollup directory (git, counts only) | `platform/evidence/analyst/` |
 | Rollup cadence | Weekly, cron-fired — see `packs/shared/metrics/SKILL.md` |
 
 ## Current level per class (mirror of command-policy, for quick reference only)

@@ -40,16 +40,21 @@ See `crons.md` for full schedule detail.
 
 ## Action-classes with current trust level
 
-| Action-class | Current level | Notes |
-|---|---|---|
-| Outreach (new) | L0 | Never above L0 without a human review step per playbook (`command-policy.md` §3) |
-| Candidate Q&A replies | L0 | |
-| Scheduling confirmations | L0 | Candidate for L1 once 2 weeks of unedited-draft evidence exists |
-| Applied-stage rejection | L0 | Candidate for L2 per trust-ladder, not before a clean 4-week window |
-| Post-work-sample/onsite rejection | NEVER DELEGATED | Post-interview rejection — hard deny, `command-policy.md` §4 |
-| Slack digest/summary posts (#hiring, #people) | L0 | Post-to-human-channel starts at L0 per `command-policy.md` §2 until evidence-based promotion |
-| Notion stage/flag/scorecard writes | L0 (internal write, not send) | Not an external send, but still verified per `platform/contracts/notion.md` write-verification step |
-| Offers / comp / terminations / performance judgments / policy changes | NEVER DELEGATED | Hard deny, `command-policy.md` §4, all postures, all levels |
+The slug column is the canonical action-class vocabulary — it must match `packs/recruiting/config/evidence.md` exactly, and it is what the evidence rollup and any promotion PR cite (`./_template.md`). Three rows below (`application_acknowledgment`, `followup_nudge`, `stage_advance`) and two slugs (`candidate_qa_reply`, `slack_digest_post`, `notion_record_write`) were reconciled against that file during this pass — see the phase report for what was invented vs. merged and why.
+
+| Action-class | Slug | Current level | Notes |
+|---|---|---|---|
+| Outreach (new) | `outreach_send` | L0 | Never above L0 without a human review step per playbook (`command-policy.md` §3) |
+| Candidate Q&A replies | `candidate_qa_reply` | L0 | |
+| Scheduling confirmations | `scheduling_confirmation` | L0 | Candidate for L1 once 2 weeks of unedited-draft evidence exists |
+| Application acknowledgment | `application_acknowledgment` | L0 | Auto-reply confirming a new application was received; candidate for L1, same G13 send-capability precondition as `outreach_send` |
+| Outreach follow-up nudge (3-day / 7-day silence) | `followup_nudge` | L0 | Same G13 precondition as `outreach_send` before any promotion |
+| Applied-stage rejection | `applied_stage_rejection` | L0 | Candidate for L2 per trust-ladder, not before a clean 4-week window |
+| Stage-advance notification | `stage_advance` | L0 | Candidate-facing advance notice; L2-eligible at the earliest. Advance-to-onsite is excluded and stays human (PRD §12.3) |
+| Post-work-sample/onsite rejection | n/a | NEVER DELEGATED | Post-interview rejection — hard deny, `command-policy.md` §4 |
+| Slack digest/summary posts (#hiring, #people) | `slack_digest_post` | L0 | Post-to-human-channel starts at L0 per `command-policy.md` §2 until evidence-based promotion |
+| Notion stage/flag/scorecard writes | `notion_record_write` | L0 (internal write, not send) | Not an external send, but still verified per `platform/contracts/notion.md` write-verification step |
+| Offers / comp / terminations / performance judgments / policy changes | n/a | NEVER DELEGATED | Hard deny, `command-policy.md` §4, all postures, all levels |
 
 ## Accountable human
 
