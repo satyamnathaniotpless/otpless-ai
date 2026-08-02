@@ -73,6 +73,35 @@ Executable procedure (pass condition, synthetic fixture, and failure action per 
 - [ ] Kill test: close all human sessions 48h → crons still fire, digest still posts
 - [ ] `node evals/run.mjs` green in CI on a no-op PR
 
+## 4b. Observed on the first live deployment (2026-08-02)
+
+Everything below was hit for real on the way to a green stack. Recorded so the next deployment does not rediscover them.
+
+| Issue | What happens | Fix |
+|---|---|---|
+| **qm scaffold omits `SANDBOX_BACKEND`** | `config.js` injects `SANDBOX_BACKEND=sprites` at render time for the fly target, but `secrets.js` decides `SPRITES_TOKEN` is required by reading `env.core.SANDBOX_BACKEND` — which the scaffold never writes. So the CLI never collects or pushes the token, and core crash-loops on `missing or insecure required core secrets: SPRITES_TOKEN`. **`qm check` listing `SPRITES_TOKEN` under required secrets is the signal the fix took.** | Add `"SANDBOX_BACKEND": "sprites"` to `env.core` in `qm.config.jsonc`. Upstream bug — worth reporting. |
+| **Sprites is a separate product with its own CLI** | `SPRITES_TOKEN` does not come from `flyctl`. On the fly target Sprites is the only sandbox backend (`sandbox.backend` accepts `"sprites"` or `"aws"`, and `"aws"` requires target `aws`). | `curl -fsSL https://sprites.dev/install.sh \| bash`, then `sprite login`, or generate at sprites.dev/account. Note `sprite login` drops you into a remote sandbox shell — `exit` to return. |
+| **Managed Postgres is not in every region** | `bom` (Mumbai) is unavailable; `qm up` fails at cluster creation. Available at time of writing: ams dfw fra gru iad lax lhr nrt ord sin sjc syd yyz. | Use `sin` (Singapore) for an IST team. |
+| **`AUTH_EMAIL_FROM` wants an address, not a name** | The setup prompt reads like a display-name field; entering a name makes auth refuse to boot with `must be a verified sender address`. | Use a bare address. `onboarding@resend.dev` works without domain verification but only delivers to the Resend account owner (gate G28). |
+| **Machines park after 10 failed restarts** | Once a config error has crash-looped a machine, Fly stops retrying. It stays `stopped`/`created` even after the config is fixed. | `qm up` to apply staged secrets, then `fly machine start <id> -a <app>`. A plain restart does **not** apply staged secrets. |
+| **First image pull is slow** | The core image took ~83s to pull, so the machine sits in `created` after a blue-green cutover and `check --live` reports `machine state is created instead of started`. | Start it; not an error. |
+| **Egress is fail-open** | Core logs `SANDBOX_BACKEND=sprites without SPRITES_EGRESS_PROXY_URL — sandboxes run with NO egress enforcement`. | Gate G27. Close before any real candidate data. |
+
+Sequence that worked, end to end:
+
+```bash
+qm init . --org otpless --target fly     # in a directory that is NOT otpless-ai
+npm install
+# edit qm.config.jsonc: region, flyOrg, and add SANDBOX_BACKEND to env.core
+fly apps create otpless-sandboxes --org <org>
+qm setup
+fly storage create -a otpless-core -n otpless-data
+qm sandbox publish                       # needs Docker running
+qm secrets push
+qm up
+qm check --live
+```
+
 ## 5. Cutover
 
 Day 1–2 shadow mode (agent drafts, human does the work in parallel); day 3 the agent's drafts become the workflow; week 2 L1 promotion review per ADR-004 evidence.
