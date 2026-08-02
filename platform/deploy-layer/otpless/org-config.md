@@ -9,7 +9,7 @@
 | Org slug | `otpless` |
 | Timezone | `Asia/Kolkata` (IST) — all crons (standup 08:30 IST, digests, retros) are scheduled against this |
 | Currency (for any config that needs one) | INR (₹), LPA convention for comp bands |
-| Agent public name | TODO(gate): G8 — founder-decided public name for the recruiter agent |
+| Agent public name | **Scout** (recruiter agent) — founder-decided 2026-08-02 |
 
 ## Scopes to create (in order)
 
