@@ -6,12 +6,16 @@
 
 Two not-yet-created Notion objects, one contract, because both are consumed by the same two P2 scopes and both inherit the split-brain and citation discipline below. **Employees DB**: the People spine's lifecycle record (person, role, manager, start date, comp, ESOP, documents status, lifecycle stage — master PRD §6). **Policies wiki**: the sole source People-Ops may answer policy questions from — no policy improv, ever (master PRD §4, §6). Neither exists in the Notion workspace today (gates G16, G17 — `docs/gates.md`).
 
+## Mechanism
+
+Reached through qm's **Notion connector** — the same connector `notion.md` uses (`platform/contracts/README.md` "How a contract reaches its system"). Confirmed registered (Admin-UI step, `/admin/connectors`) on the OTPLESS deployment; whether the Onboarder and People-Ops agents' own identities have each completed the second, individual connection step at `/keychain` is unverified — confirm at deploy time before assuming any read/write below is callable, once the Employees DB and Policies wiki themselves exist (gates G16/G17). Once connected, each agent is handed whatever tools the connector's Notion integration exposes — this contract states the operations we need, not a tool name; no tool name is invented here.
+
 ## What we read
 
-- `notion-query-data-sources` / `notion-query-database-view`: Employees DB rows filtered by lifecycle stage (Onboarder: day-1/30/60/90 tracking) or by employee (People-Ops: cross-reference against `platform/contracts/hrms.md` reads).
-- `notion-fetch`: a specific employee row, or a specific Policies wiki page. **Every policy-Q&A answer requires a fetch performed this turn** — never answered from a page fetched earlier in the session or from memory of prior content (PRD §8 split-brain rule, same discipline as `notion.md`).
-- `notion-search`: locate an employee row or a policy page when the exact one isn't known (e.g. by name or topic keyword).
-- `notion-get-comments`: existing notes/discussion on an employee row or a policy page.
+- Query a data source / database view: Employees DB rows filtered by lifecycle stage (Onboarder: day-1/30/60/90 tracking) or by employee (People-Ops: cross-reference against `platform/contracts/hrms.md` reads).
+- Fetch a page by id: a specific employee row, or a specific Policies wiki page. **Every policy-Q&A answer requires a fetch performed this turn** — never answered from a page fetched earlier in the session or from memory of prior content (PRD §8 split-brain rule, same discipline as `notion.md`).
+- Search: locate an employee row or a policy page when the exact one isn't known (e.g. by name or topic keyword).
+- Read comments on a page: existing notes/discussion on an employee row or a policy page.
 
 **Citation requirement (hard rule, not a style preference):** every People-Ops answer to a policy question must name the exact source it was drawn from. Note that the canonical source is `brain/people/` (ADR-003) and this wiki is its human-facing mirror — so the citation is the `brain/` file and its status in `brain/people/policies-index.md`, and this contract's role is the cross-check below, not the citation itself. An answer with no source named must not be given — the correct response is "I don't have a citation for that yet — escalating," not a best-effort synthesis from several partial matches.
 
@@ -21,8 +25,8 @@ Two not-yet-created Notion objects, one contract, because both are consumed by t
 
 ## What we write
 
-- `notion-update-page` (Onboarder only): lifecycle-stage transitions (e.g. Day-1 confirmed, 30/60/90 checkpoint reached), documents-status updates (BGV/paperwork complete), buddy-assignment field.
-- `notion-create-pages` (Onboarder only): a new Employee row at offer-accept handoff from the Recruiter scope — not exercised until the Employees DB exists (gate G16).
+- Update a page's properties (Onboarder only): lifecycle-stage transitions (e.g. Day-1 confirmed, 30/60/90 checkpoint reached), documents-status updates (BGV/paperwork complete), buddy-assignment field.
+- Create a page (Onboarder only): a new Employee row at offer-accept handoff from the Recruiter scope — not exercised until the Employees DB exists (gate G16).
 - **People-Ops never writes to the Policies wiki.** Policy changes are NEVER DELEGATED (`command-policy.md` §4) — People-Ops is read-only against the Policies wiki, full stop, the same absolute rule `hrms.md` states for HRMS writes. People-Ops also never writes to the Employees DB — that is Onboarder's write surface, not People-Ops's; People-Ops reads it only, to cross-reference.
 
 ## Field & name mapping
@@ -37,13 +41,14 @@ Same split-brain rule as `notion.md` (PRD §8): humans (the accountable human, a
 
 ## Write verification
 
-After any Employees DB write (Onboarder only), re-read the row (`notion-fetch` or a targeted query) and confirm the new value matches before reporting that lifecycle step complete — same pattern as `notion.md`. People-Ops has no write path against either object, so nothing to verify on its side.
+After any Employees DB write (Onboarder only), re-read the row (a page fetch or a targeted query) and confirm the new value matches before reporting that lifecycle step complete — same pattern as `notion.md`. People-Ops has no write path against either object, so nothing to verify on its side.
 
 ## Failure modes
 
 | Failure | Consuming skill must |
 |---|---|
 | Notion unavailable | Halt that section, report "Notion (Employees/Policies): unreachable," never fall back to a prior session's cached rows |
+| Connector registered but not connected (the Onboarder's or People-Ops's identity hasn't completed the `/keychain` step) | Halt, report "Notion (Employees/Policies): not connected," escalate as an onboarding/connection step — distinct from "unreachable" |
 | Rate-limited | Back off, retry once; if still failing, report partial results explicitly labeled incomplete |
 | Permission-denied (machine user lacks access) | Halt, escalate to the accountable human as a credential/grant issue — do not proceed on partial access |
 | Ambiguous result (duplicate employee rows, or multiple policy pages matching a query) | Present all matches to the accountable human/asking employee; never guess which is authoritative, never synthesize one answer out of several ambiguous pages |
@@ -61,4 +66,7 @@ The Employees DB and Policies wiki do not exist in Notion yet (gates G16, G17 �
 
 ## Credentials required
 
-- Notion integration token for the Onboarder agent's and the People-Ops agent's own machine users (never a human's, never shared with the recruiting agent's token or each other's) — scoped to the Employees DB and Policies wiki once created, provided by: Founder (Notion workspace admin) — gates G16 (Employees DB creation + grant) and G17 (Policies wiki creation + grant), `docs/gates.md`.
+Two separate steps, per the connector model (`platform/contracts/README.md`):
+
+- **Admin client registration** — the Notion OAuth client id/secret entered at `/admin/connectors`. Confirmed done on the OTPLESS deployment (shared registration; not object-specific). Provided by: Founder (Notion workspace admin) — gates G16/G17, `docs/gates.md`.
+- **User connection** — the Onboarder agent's and the People-Ops agent's own identities (never a human's, never shared with the recruiting agent's connection or each other's) each completing their own connection at `/keychain`, scoped to the Employees DB and Policies wiki once created. Whether either has been done is unverified — reconfirm at deploy time. Which qm identity model this binds to (dedicated per-agent machine accounts vs. a shared operator account) is itself unverified — confirm against qm's scope/connector-permission model before assuming Onboarder and People-Ops have isolated access from each other. Provided by: Founder — gates G16 (Employees DB creation + grant) and G17 (Policies wiki creation + grant), `docs/gates.md`.

@@ -6,15 +6,24 @@
 
 India-specific candidate and employee messaging channel: candidates and employees answer WhatsApp in minutes where email takes days (master PRD §4 row 4/5 context; `PRD_Recruiting_System.md` §6 WhatsApp row). That speed is exactly why this channel carries the tightest rules in the platform, not the loosest — a fast channel that goes wrong is a fast-moving incident.
 
+## Mechanism
+
+**Undecided.** WhatsApp Business is not one of qm's OAuth-provider connectors (confirmed live today: Google, Notion, Slack — `platform/contracts/README.md`); there is no fourth "WhatsApp" connector to register. The two real candidates, per qm's actual mechanism set:
+
+1. **A sandbox tool** — `sandbox/tools/<id>/tool.json` plus an executable in the sandbox image, with `egress` pinned to the WhatsApp Business (Cloud) API host(s) only, and `approvals` encoding the platform-enforced gate on any send-shaped invocation.
+2. **A plugin** — a prebuilt image running alongside the qm services, declared in `qm.config.jsonc`, if the integration needs its own long-running service (e.g. a webhook receiver for inbound messages/delivery receipts) rather than a callable tool.
+
+Neither is chosen. This is a build decision to make once an account exists (gate G20), not a data-shape decision — see "Capability gaps today."
+
 ## What we read
 
-**None today.** No MCP server exists for the WhatsApp Business API in any form — not even the draft/read/label-only shape Gmail has (`gmail.md`). This is a capability gap, not a data-shape decision (see "Capability gaps today"). Once an MCP exists, this section covers: inbound message text per conversation, and delivery/read-receipt status — the WhatsApp analogue of Gmail's `search_threads`/`get_thread`.
+**None today.** Whichever mechanism above is chosen, this section covers: inbound message text per conversation, and delivery/read-receipt status — the WhatsApp analogue of Gmail's thread/message read (`gmail.md`).
 
 ## What we write
 
-**None today**, for the same reason. The capability this contract describes for the day an MCP exists: a draft-equivalent operation — compose message text against a specific pre-approved template and recipient — never a `send` operation callable by a skill directly. **Drafts only, same approval gate as every other channel, at every trust level** (ADR-007: the draft is the contract boundary; no channel earns a send capability by assumption, only by verification). No auto-send at any trust level until both (a) the relevant action-class has earned it on this channel specifically — WhatsApp does not inherit Gmail's or Slack's evidence — and (b) this channel's send capability is verified present per `platform/scripts/verify-deployment.md`.
+**None today**, for the same reason. The capability this contract describes for the day a mechanism exists: a draft-equivalent operation — compose message text against a specific pre-approved template and recipient — never a `send` operation callable by a skill directly. **Drafts only, same approval gate as every other channel, at every trust level** (ADR-007: the draft is the contract boundary; no channel earns a send capability by assumption, only by verification). No auto-send at any trust level until both (a) the relevant action-class has earned it on this channel specifically — WhatsApp does not inherit Gmail's or Slack's evidence — and (b) this channel's send capability is verified present per `platform/scripts/verify-deployment.md`.
 
-Until an MCP exists, every skill's WhatsApp output is message text only, handed to the accountable human to send by hand from the WhatsApp Business app/console — the same "manual paste" bridge already named in the recruiting and onboarding scope files' Connectors-required sections.
+Until a mechanism exists, every skill's WhatsApp output is message text only, handed to the accountable human to send by hand from the WhatsApp Business app/console — the same "manual paste" bridge already named in the recruiting and onboarding scope files' Connectors-required sections.
 
 ## Field & name mapping
 
@@ -28,13 +37,13 @@ Same split-brain discipline as every other candidate/employee channel (PRD §8):
 
 ## Write verification
 
-Not applicable today — no write capability exists (see "What we write"). Once an MCP with a draft-equivalent operation lands, the pattern to add here, by amendment: re-fetch the queued draft and confirm it is attached to the correct conversation and the correct approved template before reporting it ready for operator review — same shape as `gmail.md`'s `create_draft`/`list_drafts` verification step.
+Not applicable today — no write capability exists (see "What we write"). Once a mechanism with a draft-equivalent operation lands (see "Mechanism"), the pattern to add here, by amendment: re-fetch the queued draft and confirm it is attached to the correct conversation and the correct approved template before reporting it ready for operator review — same shape as `gmail.md`'s draft-then-confirm verification step.
 
 ## Failure modes
 
 | Failure | Consuming skill must |
 |---|---|
-| No MCP / connector (true today, always) | Report "WhatsApp: no connector yet," output message text only for manual send, never claim an API call happened |
+| No mechanism exists (true today, always) | Report "WhatsApp: no connector/tool yet," output message text only for manual send, never claim an API call happened |
 | System unavailable (post-gate) | Halt that section, report "WhatsApp: unreachable," never estimate a conversation state from a prior session |
 | Rate-limited | Back off, retry once; report partial results explicitly labeled incomplete |
 | Permission-denied | Halt, escalate to the accountable human as a credential/grant issue |
@@ -54,12 +63,12 @@ If a draft would need any of the above to make sense, the draft is wrong, not th
 
 ## Capability gaps today
 
-**No MCP server exists at all** — not draft/read/label like Gmail, nothing. This is the largest capability gap of any contract in this index: extending or building an MCP server for the WhatsApp Business (Cloud) API, once an account exists, is the fix — never a raw HTTP call, never a headless-browser workaround, per CLAUDE.md's MCP-only rule and ADR-007. Until it exists, every skill that would use this channel outputs message text only, for a human to paste and send manually — the bridge already named in `PRD_Recruiting_System.md` §6 and the recruiter/onboarder scope files.
+**No mechanism exists at all** — not draft/read/label like Gmail, nothing, and no connector to register either (see "Mechanism"). This is the largest capability gap of any contract in this index: building a sandbox tool (egress-pinned to the WhatsApp Business Cloud API) or standing up a plugin, once an account exists, is the fix — never a raw HTTP call, never a headless-browser workaround, per CLAUDE.md's MCP-only rule (read, in this repo, as "platform-mechanism-only": connector, sandbox tool, or plugin — never a bypass) and ADR-007. Until it exists, every skill that would use this channel outputs message text only, for a human to paste and send manually — the bridge already named in `PRD_Recruiting_System.md` §6 and the recruiter/onboarder scope files.
 
-Two further gaps sit on top of "build the MCP," each its own human gate, and neither is closed by the MCP existing:
+Two further gaps sit on top of "build the mechanism," each its own human gate, and neither is closed by the mechanism existing:
 
-1. **Template-message compliance is a hard constraint, not a nicety.** WhatsApp Business requires a pre-approved message template for any business-initiated message sent outside an open customer-service window, and a recipient's reply does not retroactively approve the template that opened the thread. Recruiting/HR outreach on this channel has real compliance exposure — using it for candidate or employee messaging is a decision with its own review, not a default extension of "we already have WhatsApp." **No message goes out on a template that has not cleared this compliance review, at any trust level, regardless of MCP readiness.**
-2. **Whose infrastructure.** OTPLESS is an auth company with WhatsApp Business infrastructure already built for its own product — but reusing that infrastructure for HR/recruiting outreach is a separate decision with its own compliance and separation questions (mixing HR traffic into a product WABA's quality/category rating; whether a candidate or employee receiving a message from the company's own product number blurs the AI-disclosure and trust line for a company whose product *is* trust). It is not an automatic yes because the capability happens to exist in-house, and it is gated distinctly from the MCP-build decision above.
+1. **Template-message compliance is a hard constraint, not a nicety.** WhatsApp Business requires a pre-approved message template for any business-initiated message sent outside an open customer-service window, and a recipient's reply does not retroactively approve the template that opened the thread. Recruiting/HR outreach on this channel has real compliance exposure — using it for candidate or employee messaging is a decision with its own review, not a default extension of "we already have WhatsApp." **No message goes out on a template that has not cleared this compliance review, at any trust level, regardless of mechanism readiness.**
+2. **Whose infrastructure.** OTPLESS is an auth company with WhatsApp Business infrastructure already built for its own product — but reusing that infrastructure for HR/recruiting outreach is a separate decision with its own compliance and separation questions (mixing HR traffic into a product WABA's quality/category rating; whether a candidate or employee receiving a message from the company's own product number blurs the AI-disclosure and trust line for a company whose product *is* trust). It is not an automatic yes because the capability happens to exist in-house, and it is gated distinctly from the mechanism-build decision above.
 
 ## Credentials required
 

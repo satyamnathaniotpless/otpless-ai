@@ -47,7 +47,7 @@ Delete this section only if the system genuinely carries no personal data. Most 
 
 ## Capability gaps today
 
-{What the MCP cannot do yet. Extending the MCP is the fix — never a curl bypass. List as a finding, not a workaround.}
+{What the mechanism cannot do yet — see the three mechanisms in `README.md` (connector / sandbox tool / plugin). The fix is always to extend the mechanism: request a broader connector scope, add a tool, or ship a plugin. Never a raw HTTP call, a scraped portal, or a human's personal credential. List as a finding, not a workaround.}
 
 ## Credentials required
 

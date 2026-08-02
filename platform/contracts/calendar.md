@@ -6,19 +6,23 @@
 
 Availability, event creation, and confirmation state for candidate scheduling (PRD §6, F5).
 
+## Mechanism
+
+Reached through qm's **Google connector** (`platform/contracts/README.md` "How a contract reaches its system") — the same connector `gmail.md` uses, registered once for Google Workspace as a whole. Confirmed registered (Admin-UI step) on the OTPLESS deployment; whether the recruiting agent's own identity (`recruiting@otpless.com`) has completed the second, individual connection step at `/keychain` is unverified — confirm at deploy time before assuming any read/write below is callable. Once connected, the agent is handed whatever Calendar-capability tools the connector exposes — this contract states the operations we need, not a tool name; where a name would matter it is called out as unverified rather than invented.
+
 ## What we read
 
-- `list_calendars`: the agent's own calendar and any interviewer calendars it has access to.
-- `list_events` / `search_events`: existing events in the proposal window (F1: next 7 days; F5: before proposing any block).
-- `get_event`: attendee `responseStatus` for a specific event (F5, F8).
-- `suggest_time`: candidate free/busy slots within a block.
+- List calendars: the agent's own calendar and any interviewer calendars it has access to.
+- List or search events: existing events in the proposal window (F1: next 7 days; F5: before proposing any block).
+- Fetch an event: attendee `responseStatus` for a specific event (F5, F8).
+- Suggest a time: candidate free/busy slots within a block.
 
 ## What we write
 
-- `create_event`: new candidate-facing events, template titles/descriptions, meet link from `user.md` (F5).
-- `update_event`: reschedules.
-- `respond_to_event`: the agent's own RSVP where applicable.
-- `delete_event`: cancellations — treated as an external-visible action, same L0 approval gate as creating an event with an external attendee (`command-policy.md` §2), never auto-executed.
+- Create an event: new candidate-facing events, template titles/descriptions, meet link from `user.md` (F5).
+- Update an event: reschedules.
+- Respond to an event: the agent's own RSVP where applicable.
+- Delete an event: cancellations — treated as an external-visible action, same L0 approval gate as creating an event with an external attendee (`command-policy.md` §2), never auto-executed.
 
 ## Field & name mapping
 
@@ -32,16 +36,17 @@ Re-check Calendar before proposing any block and before every `/schedule` or `/c
 
 ## Write verification
 
-After `create_event`/`update_event`, call `get_event` (or `list_events`) to re-fetch and confirm title, time, and attendee list match what was written before reporting the event as scheduled.
+After creating or updating an event, re-fetch it (or re-list events) to confirm title, time, and attendee list match what was written before reporting the event as scheduled.
 
 ## Failure modes
 
 | Failure | Consuming skill must |
 |---|---|
 | Calendar unavailable | Do not guess free/busy; tell the operator to check manually before proposing times |
+| Connector registered but not connected (agent's identity hasn't completed the `/keychain` step) | Halt, report "Calendar: not connected," escalate as an onboarding/connection step — distinct from "unreachable" |
 | Rate-limited | Back off, retry once; report partial availability labeled incomplete |
 | Permission-denied | Halt, escalate as a Calendar grant issue |
-| Ambiguous result (`suggest_time` returns multiple equally-valid slots, or multiple events match a search) | Present all options to the operator; never auto-pick |
+| Ambiguous result (a time-suggestion returns multiple equally-valid slots, or multiple events match a search) | Present all options to the operator; never auto-pick |
 
 ## PII handling
 
@@ -51,8 +56,11 @@ This is why the title rule in "Field & name mapping" is a PII control, not a sty
 
 ## Capability gaps today
 
-No way to generate or verify a live video-conferencing link through this MCP — the meet link is a static value pulled from `user.md` config, not created per-event. If per-event unique links are ever required, that's an MCP extension, not a config workaround.
+No confirmed way to generate or verify a live video-conferencing link through this connector — the meet link is a static value pulled from `user.md` config, not created per-event. Whether the Google connector's Calendar integration can create a per-event unique link is unverified; if per-event unique links are ever required, confirm that capability first, and if absent, extend it (connector or a scoped sandbox tool) — never a config workaround pretending the link is unique.
 
 ## Credentials required
 
-- OAuth token for the recruiting agent's own calendar (`recruiting@otpless.com`) — provided by: CTO (Google Workspace admin) — gate G5, `docs/gates.md`.
+Two separate steps, per the connector model (`platform/contracts/README.md`):
+
+- **Admin client registration** — the Google OAuth client id/secret entered at `/admin/connectors`. Confirmed done on the OTPLESS deployment. Provided by: CTO (Google Workspace admin) — gate G5, `docs/gates.md`.
+- **User connection** — the recruiting agent's own calendar (`recruiting@otpless.com`) completing the connection at `/keychain`. Whether this has happened is unverified — reconfirm at deploy time; a registered-but-unconnected connector does nothing. Provided by: CTO — gate G5, `docs/gates.md`.

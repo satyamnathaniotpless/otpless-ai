@@ -66,7 +66,7 @@ Batch queries — all Notion reads in parallel, all Gmail queries in parallel. D
 
 ## Verification step (after every write)
 
-- After a Gmail draft → re-query `gmail_list_drafts`, confirm threadId matches.
+- After a Gmail draft → re-query the drafts list through the Google connector and confirm the threadId matches. (Capability, not a tool name: the connector's exact operation names are unverified — `platform/contracts/gmail.md`.)
 - After a calendar event → re-query events for that window, confirm attendees + time.
 - After a Notion stage/flag update → re-read the row, confirm the new value stuck.
 Do not report success until verified.

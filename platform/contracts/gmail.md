@@ -1,4 +1,4 @@
-<!-- Purpose: contract between recruiting skills and Gmail — candidate email — so no skill ever touches the Gmail MCP or assumes a send capability it doesn't have. -->
+<!-- Purpose: contract between recruiting skills and Gmail — candidate email — so no skill ever assumes a connector tool name or a send capability it doesn't have. -->
 
 # Contract: Gmail
 
@@ -6,16 +6,20 @@
 
 Candidate email channel — reply in-thread, draft everything, send only on operator approval (PRD §6, §8 guardrail 1).
 
+## Mechanism
+
+Reached through qm's **Google connector** (`platform/contracts/README.md` "How a contract reaches its system") — the same connector `calendar.md` uses, registered once for Google Workspace as a whole. Confirmed registered (Admin-UI step) on the OTPLESS deployment; whether the recruiting agent's own mailbox (`recruiting@otpless.com`) has completed the second, individual connection step at `/keychain` is unverified — confirm at deploy time before assuming any read/write below is callable. Once connected, the agent is handed whatever Gmail-capability tools the connector exposes — this contract states the operations we need, not a tool name; where a name would matter it is called out as unverified rather than invented.
+
 ## What we read
 
-- `search_threads`: candidate threads in a recent window (F1 triage: last 3 days).
-- `get_thread` / `get_message`: full thread content before drafting a reply, and to check for an email-address-change request (guardrail 7).
-- `list_drafts`: drafts pending across the mailbox (F1, F8).
+- Search threads in a recent window: candidate threads (F1 triage: last 3 days).
+- Fetch a thread or message: full thread content before drafting a reply, and to check for an email-address-change request (guardrail 7).
+- List drafts: drafts pending across the mailbox (F1, F8).
 
 ## What we write
 
-- `create_draft` / `update_draft`: every candidate-facing reply, outreach, rejection, and scheduling confirmation (F3, F4, F5, F6) — draft only, never sent by the skill itself.
-- `label_message` / `label_thread`, `create_label`: triage/categorization labels if a skill needs to mark threads (no label taxonomy defined yet — add one to `packs/recruiting/config/` before relying on this).
+- Create or update a draft: every candidate-facing reply, outreach, rejection, and scheduling confirmation (F3, F4, F5, F6) — draft only, never sent by the skill itself.
+- Apply a label to a message/thread, create a label: triage/categorization labels if a skill needs to mark threads (no label taxonomy defined yet — add one to `packs/recruiting/config/` before relying on this).
 
 ## Field & name mapping
 
@@ -29,13 +33,14 @@ Operators reply and act in Gmail outside the agent constantly (split-brain, PRD 
 
 ## Write verification
 
-After `create_draft`/`update_draft`, call `list_drafts` or `get_thread` to confirm the draft appears attached to the correct thread before reporting the draft as ready for operator review.
+After creating or updating a draft, list drafts or fetch the thread to confirm the draft appears attached to the correct thread before reporting the draft as ready for operator review.
 
 ## Failure modes
 
 | Failure | Consuming skill must |
 |---|---|
 | Gmail unavailable | Skip email-sourced categories in triage, state explicitly "Gmail: unreachable," never present an empty email section as "nothing pending" |
+| Connector registered but not connected (mailbox hasn't completed the `/keychain` step) | Halt, report "Gmail: not connected," escalate as an onboarding/connection step — distinct from "unreachable" |
 | Rate-limited | Back off, retry once; report partial results labeled incomplete |
 | Permission-denied | Halt, escalate as a mailbox/OAuth grant issue — never fall back to another mailbox |
 | Ambiguous result (multiple threads matching a candidate) | Surface all matches to the operator; never guess which thread to reply in |
@@ -48,9 +53,12 @@ A candidate email thread can contain anything a candidate chose to volunteer —
 
 ## Capability gaps today
 
-**No send tool.** The available Gmail MCP operations are draft/label/read only — there is no `send` operation. Every "approved send" in the PRD (§6, §8) therefore still requires a human to actually send the drafted message (or the MCP must be extended with an approval-gated send tool before any action-class can reach L1/L2 for sends). This is the single largest gap between the PRD's stated capability and what's available today — flag for extension, not a workaround. Tracked as gate G13, `docs/gates.md`, owner CTO (ADR-007: the send capability is verified/extended at deploy time, never worked around).
+**Send capability is unverified.** Whether the Google connector's Gmail integration exposes a `send` operation at all is not established — treat it as draft/label/read only until confirmed against the running deployment (`platform/scripts/verify-deployment.md`). Every "approved send" in the PRD (§6, §8) therefore still requires a human to actually send the drafted message unless and until a send operation is confirmed present and gated by approval. If none exists, the fix is a sandbox tool (scoped via `egress` to Gmail's API host, gated via `approvals`) or a connector extension — never a raw HTTP call or a headless-browser workaround. This is the single largest gap between the PRD's stated capability and what's confirmed available today. Tracked as gate G13, `docs/gates.md`, owner CTO (ADR-007: the send capability is verified/extended at deploy time, never worked around).
 
 ## Credentials required
 
-- OAuth token for the recruiting agent's own mailbox (`recruiting@otpless.com`) — provided by: CTO (Google Workspace admin) — gate G5, `docs/gates.md`.
+Two separate steps, per the connector model (`platform/contracts/README.md`):
+
+- **Admin client registration** — the Google OAuth client id/secret entered at `/admin/connectors`. Confirmed done on the OTPLESS deployment. Provided by: CTO (Google Workspace admin) — gate G5, `docs/gates.md`.
+- **User connection** — the recruiting agent's own mailbox (`recruiting@otpless.com`) completing the connection at `/keychain`. Whether this has happened is unverified — reconfirm at deploy time; a registered-but-unconnected connector does nothing. Provided by: CTO — gate G5, `docs/gates.md`.
 - SPF/DKIM DNS records for the mailbox — provided by: CTO (DNS access) — gate G5, human gate per CLAUDE.md.
