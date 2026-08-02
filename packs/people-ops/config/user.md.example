@@ -17,7 +17,7 @@
 
 | Operator | Role | Owns | Email |
 |---|---|---|---|
-| Satyam | Founder | Policy approvals, offer/comp/termination judgment calls, escalation point until a People Lead is hired | satyam@otpless.com |
+| Satyam | Founder | Policy approvals, offer/comp/termination judgment calls, escalation point until a People Lead is hired | {founder email} |
 | {People Lead, once hired} | People Lead | Day-to-day queue review, playbook PR merges, SLA ownership (master PRD §5) | {TODO once hired} |
 
 ## Logistics

@@ -17,7 +17,7 @@
 
 | Operator | Role | Owns | Email |
 |---|---|---|---|
-| Satyam | Founder | All offers/comp/closes; final say on any escalated counteroffer or BGV flag | satyam@otpless.com |
+| Satyam | Founder | All offers/comp/closes; final say on any escalated counteroffer or BGV flag | {founder email} |
 | {CTO name} | CTO | Provisioning approvals, IT/Admin liaison, technical-role buddy pool | {cto email} |
 | {People Lead name, once hired} | Founding Recruiter → People Lead | Day-to-day queue ownership, playbook tuning, SLA ownership (master PRD §5) | {people lead email} |
 

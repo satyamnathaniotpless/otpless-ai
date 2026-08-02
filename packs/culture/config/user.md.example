@@ -19,7 +19,7 @@ No PII or secrets in this template. The real `user.md` is gitignored, same as th
 
 | Operator | Role | Owns | Email |
 |---|---|---|---|
-| Satyam | Founder | All never-delegated decisions across this pack: performance judgments, review content, calibration, offboarding/termination decisions, policy | satyam@otpless.com |
+| Satyam | Founder | All never-delegated decisions across this pack: performance judgments, review content, calibration, offboarding/termination decisions, policy | {founder email} |
 | {People Lead / manager, once hired} | People Lead | Day-to-day review of this agent's queues, tunes cadence config once decided | {email} |
 
 ## Escalation contacts (immediate, per `../config/playbook.md` §Immediate escalation pattern)

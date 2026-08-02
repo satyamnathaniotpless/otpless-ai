@@ -130,7 +130,11 @@ function walkMarkdown(dir) {
     const rel = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       out.push(...walkMarkdown(rel));
-    } else if (entry.isFile() && entry.name.endsWith(".md")) {
+    } else if (entry.isFile() && (entry.name.endsWith(".md") || entry.name.endsWith(".md.example"))) {
+      // `.md.example` files are included deliberately. They were invisible to every check in
+      // this harness until the sandbox-layer builder caught a real address sitting in four of
+      // them — a template is still a file that ships, and the PII rule applies to it exactly
+      // as it does to a `.md`.
       out.push(rel);
     }
   }
@@ -823,6 +827,40 @@ if (!exists(cultPlaybook)) {
   }
   if (missingRules.length === 0) {
     row(true, `all ${SUPPRESSION_RULES.length} differencing-resistance rules present`);
+  }
+}
+
+// ---------------------------------------------------------------------------
+console.log("\n=== 13. SANDBOX LAYER BUILD (platform/scripts/build-sandbox-layer.mjs, dry run) ===\n");
+
+// This is the qm deployment seam itself: if the current packs/** + platform/contracts/**
+// content can't assemble into a verified sandbox/skills/ tree (a dead reference, a bad
+// frontmatter, a PII leak, an oversized bundle, a skill-name collision), that is exactly the
+// class of failure this eval suite exists to catch before it reaches a real deployment — so a
+// red here blocks the suite the same as every other check group.
+const BUILD_SANDBOX_LAYER_SCRIPT = "platform/scripts/build-sandbox-layer.mjs";
+if (!exists(BUILD_SANDBOX_LAYER_SCRIPT)) {
+  row(false, BUILD_SANDBOX_LAYER_SCRIPT, "file does not exist — cannot verify the sandbox layer builds");
+} else {
+  try {
+    execSync(`node ${JSON.stringify(BUILD_SANDBOX_LAYER_SCRIPT)}`, {
+      cwd: ROOT,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    row(true, "sandbox layer builds clean in dry-run mode (0 verification failures)");
+  } catch (err) {
+    // The builder prints its own ✅/❌ report; surface just its failure lines here rather than
+    // the whole report, so a red in this suite points straight at the cause.
+    const output = `${err.stdout || ""}${err.stderr || ""}`;
+    const failureLines = output.split("\n").filter((l) => l.trim().startsWith("❌"));
+    row(
+      false,
+      "sandbox layer builder failed in dry-run mode",
+      failureLines.length > 0
+        ? failureLines.map((l) => l.trim()).join(" | ")
+        : "see `node platform/scripts/build-sandbox-layer.mjs` output"
+    );
   }
 }
 

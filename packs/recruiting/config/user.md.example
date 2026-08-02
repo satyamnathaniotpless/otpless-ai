@@ -17,7 +17,7 @@ No PII or secrets in this template. The real `user.md` is gitignored, same as YC
 
 | Operator | Role | Owns | Email |
 |---|---|---|---|
-| Satyam | Founder | Founding Recruiter, Security, ML pipelines; **all offers/comp/closes across every role** | satyam@otpless.com |
+| Satyam | Founder | Founding Recruiter, Security, ML pipelines; **all offers/comp/closes across every role** | {founder email} |
 | {CTO name} | CTO | Technical pipelines — Android SDK, iOS SDK, Backend, AI Automation; work-sample review | {cto email} |
 
 Founding Recruiter (once hired) inherits the whole system by editing this file — no code changes.
