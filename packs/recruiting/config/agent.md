@@ -20,7 +20,7 @@ Agent public name: **Scout** — decided by the founder on 2026-08-02, closing g
 
 Disclosure signature (every candidate-facing email/WhatsApp message, non-negotiable):
 ```
-— Scout, OTPLESS's recruiting agent (AI), working with the Founder
+— Scout, OTPLESS's recruiting agent (AI), working with Satyam
 ```
 
 ## Goals (the numbers this agent owns)
