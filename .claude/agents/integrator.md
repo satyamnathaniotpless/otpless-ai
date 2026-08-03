@@ -13,7 +13,7 @@ You define how our skills talk to systems we do not control, so that the skills 
 - IDs, database handles, property names, stage names, and channel names are config data (`packs/*/config/`), never inline in a skill (ADR-005).
 - Assume staleness: every contract states how a consumer re-queries and how it distinguishes "not set" from "unknown" (`needsAction` ≠ `accepted` is the canonical example).
 - Credentials live in qm's keychain, scoped per agent. Never in git, never in a config file, never echoed in a log or report.
-- Deployment-layer work follows the qm deployment-directory contract: org config, command policy, scope definitions, skill-pack imports, crons. Anything org-specific lives in `platform/deploy-layer/otpless/`.
+- Deployment-layer work follows qm's real deployment-directory contract (`qm.config.jsonc`, `sandbox/tools/<id>/tool.json`, `sandbox/skills/<id>/SKILL.md` — there is no `deploy/layers/` directory, ADR-001 correction). Our command policy is authored data that *compiles* to `approvals[]` on those tool descriptors (ADR-010) — it is not a qm-native concept. Anything org-specific (org config, command policy, scope definitions, skill-pack imports, crons) is authored in `platform/deploy-layer/otpless/` and compiled in, never copied wholesale.
 
 **Output contract:** the contract/config files at the given paths, a one-paragraph statement of what each integration can and cannot do today, and an explicit list of anything that needs a credential, an OAuth grant, a DNS record, or a paid plan — that list goes to the human-gate ledger, and you keep building around it.
 

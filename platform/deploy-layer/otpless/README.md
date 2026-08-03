@@ -9,7 +9,7 @@ Everything company-specific that qm's deployment-directory contract expects to l
 | File | What it is |
 |---|---|
 | `org-config.md` | Org slug, timezone, scopes to create (and in what order), surfaces, skill-pack sources. |
-| `command-policy.md` | The trust-ladder (`packs/shared/trust-ladder/SKILL.md`) expressed as enforceable policy: deny-by-default for external sends at L0, hard denials for the never-delegated list, destructive-op denials, per-scope posture. This is what actually stops an agent, not the skill's prose alone. |
+| `command-policy.md` | The trust-ladder (`packs/shared/trust-ladder/SKILL.md`) expressed as enforceable policy: deny-by-default for external sends at L0, hard denials for the never-delegated list, destructive-op denials — compiled to `approvals[]` on tool descriptors, per scope (ADR-010). This is what actually stops an agent, not the skill's prose alone. |
 | (sandbox additions) | Any OTPLESS-specific sandbox image/tooling changes go here once they exist; none yet as of this writing — flag in the phase report if a scope needs something beyond qm's default sandbox. |
 
 ## How this layer reaches a qm deployment
@@ -30,14 +30,14 @@ Corrected 2026-08-01 — see `docs/ADRS.md` "ADR-001 correction". There is no `d
 | Timezone (`Asia/Kolkata`) | **Not a `qm.config.jsonc` field.** | The verified field list (`orgId`, `publicUrl`, `target`, `modelProvider`, `appPrefix`, `region`, `flyOrg`, `services[]`, `plugins[]`, `skills[]`, per-service `env`/`secretEnv`, `sandbox.app`) has no timezone slot. Timezone-dependent scheduling (standup 08:30 IST, digests, retros) is agent/skill config carried in the packs themselves, not deployment config — restating this for clarity, not a gap to close. |
 | Agent public name (G8) | **Not a `qm.config.jsonc` field either.** | Applied post-deployment to Slack handle / mailbox display name / disclosure line; not compiled into org config. |
 
-### `command-policy.md` → qm's policy surface: **UNVERIFIED**
+### `command-policy.md` → qm's policy surface: **resolved (ADR-010)**
 
-The verified `qm.config.jsonc` field list above has no policy field. Where trust-ladder enforcement (deny-by-default at L0, never-delegated hard denials, destructive-op denials, per-scope posture) actually lands in a real qm deployment — a `plugins[]` entry, a `sandbox/tools/` addition, something else entirely — has not been confirmed against a real config. `TODO(gate)`: verify by running `qm check` against a `qm.config.jsonc` that attempts to express a `command-policy.md` rule, and record what qm accepts (or rejects) here. Until that lands, treat `command-policy.md` as authoritative prose enforced by convention and by whatever the scope's own skills refuse to do — not yet mapped to a qm-enforced field.
+The verified `qm.config.jsonc` field list above has no policy field, because the mapping was never through `qm.config.jsonc` at all: trust-ladder enforcement (deny-by-default at L0, never-delegated hard denials, destructive-op denials) lands as `approvals[{command|pattern, decision, reason}]` entries on a **sandbox tool descriptor** (`sandbox/tools/<id>/tool.json`) — not a `plugins[]` entry, not org-level config, and not a per-scope "posture." `decision` is exactly `"require_approval"` or `"deny"`; `platform/scripts/build-tool-policy.mjs` compiles `command-policy.md`'s tables into these descriptor fragments and, when a real `@yc-software/qm` is resolvable, validates them against qm's own `parseToolDescriptor`. This governs tool invocations only — `approvals` cannot reach a connector-mediated action (Google/Notion/Slack), which is the standing reason writes/sends go through tools we own while reads stay on connectors.
 
 ## Load order
 
 1. **Org config** first — `orgId` and `services[]` must be compiled and applied before any scope can be created.
-2. **Command policy** second — load and activate the policy (trust-ladder enforcement, never-delegated hard denials) *before* the first agent scope is created, so no scope ever exists without enforcement already in place. Given the unverified mapping above, this currently means confirming the policy is expressed *somewhere* qm will enforce before proceeding — not skipping this step because the field is unclear.
+2. **Command policy** second — load and activate the policy (trust-ladder enforcement, never-delegated hard denials) *before* the first agent scope is created, so no scope ever exists without enforcement already in place: every write tool's descriptor must already carry its `approvals[]` rows (§2 of `command-policy.md`) before that tool, or the scope that uses it, ships.
 3. **Skill packs** third — `packs/shared` (every scope depends on it) then `packs/recruiting` (or the relevant department pack), via `skills[]` / `sandbox/skills/` per the mapping above.
 4. **Scopes** last — create each agent scope (e.g. `recruiter`) referencing the already-loaded org config, command policy, and skill packs, plus that agent's own `agent.md` identity/goals config.
 

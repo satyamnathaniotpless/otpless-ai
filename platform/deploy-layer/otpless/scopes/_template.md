@@ -20,9 +20,9 @@
 - {system}: `platform/contracts/{system}.md`
 - ...
 
-## Security posture
+## Write/send enforcement
 
-{Auto (org default) or Strict — see `command-policy.md` §1/§7. State which, and why if it diverges from org default.}
+{There is no per-scope posture dial (`command-policy.md` §7 — "no posture, no knob"). State which write/send tools (§1) this scope will use, and for each: whether it has a `command-policy.md` row today (`require_approval` in §2, or `deny` in §4/§5) or is simply not wired yet (draft-only, no tool shipped).}
 
 ## Cron ids bound
 

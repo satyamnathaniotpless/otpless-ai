@@ -10,7 +10,7 @@ ADR-005 claims a new agent costs a pack plus a scope file, and that `packs/share
 
 ## Decisions
 
-1. **Two packs, not one "people" pack.** Onboarder and People-Ops have different trust profiles (People-Ops runs Strict on HRMS writes per command policy §1) and different data. One pack per agent keeps scopes cleanly separable.
+1. **Two packs, not one "people" pack.** Onboarder and People-Ops have different trust profiles (People-Ops has a standing HRMS-write backstop — destructive actions staged as `deny` in `command-policy.md` §5a — while performing zero HRMS writes in P2) and different data. One pack per agent keeps scopes cleanly separable.
 2. **People-Ops answers only from the Policies wiki, never from model knowledge.** This is the load-bearing guardrail of the agent — an improvised leave-policy answer is worse than no answer. Every response cites its source page, and no-citation means no answer.
 3. **HRMS is read-only in P2, and unchosen.** Keka vs RazorpayX is an open PRD question with no decision. Build the contract against the *capability* (read leave balance, prepare payroll inputs), mark the provider as a gate, and never write.
 4. **Onboarding checklists are data.** `checklists/_template.md` instantiated per role/level, exactly like `jobs/_template.md`. A new hire type is one file.

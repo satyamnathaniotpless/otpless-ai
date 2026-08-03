@@ -39,7 +39,7 @@ npm install
 
 Hand `deploy-qm` to the builder agent: it confirms the operator-owned account and billing before any mutation, configures email-gated web onboarding first, adds connectors and Slack, performs live checks, and returns the operational URLs. Initialization does not create deployment CI — deploys are agent/operator-driven by design.
 
-Compile `platform/deploy-layer/otpless/org-config.md` and `command-policy.md` into `qm.config.jsonc` (exact field mapping, and what's still unverified, in `platform/deploy-layer/otpless/README.md` — do not copy the directory anywhere; it stays in this repo as the authored source). Security posture: **Auto** org-wide; People-Ops scope starts **Strict**. Load the command policy (trust ladder, ADR-004) before the first agent scope is created.
+Compile `platform/deploy-layer/otpless/org-config.md` into `qm.config.jsonc`, and `command-policy.md` into `approvals[]` fragments merged into `sandbox/tools/<id>/tool.json` (exact field mapping in `platform/deploy-layer/otpless/README.md` — do not copy the directory anywhere; it stays in this repo as the authored source). There is no per-scope posture: every write/send action-class starts at `require_approval`, and the never-delegated classes carry `deny`, regardless of scope. Load the compiled command policy (trust ladder, ADR-004/ADR-010) before the first agent scope is created.
 
 Then run the real qm workflow, in order, inside the deployment repo:
 

@@ -22,9 +22,9 @@ The Culture & Growth agent's own pack config path (expected shape: an `agent.md`
 - Slack (`#people`): `platform/contracts/slack.md` — pulse-survey nudges, 1:1 cadence nudges, anniversary recognition, offboarding/exit-interview scheduling logistics only; never review content, never exit-interview content (see PII note below)
 - Google Calendar / Gmail: not bound — no culture action-class exercises either in P3, so neither is listed as required here (ADR-005: don't bind a connector before a skill needs it), matching the pattern `people-ops.md` already set for Calendar; revisit if exit-interview or review-cycle scheduling ends up needing calendar writes
 
-## Security posture
+## Write/send enforcement
 
-**Auto** (org default) — per `command-policy.md` §7 ("`onboarder`, `analyst`, `culture` ... inherit org default"). Auto affects content screening, not the trust ladder below; every action-class still starts at L0.
+No per-scope posture dial exists (`command-policy.md` §7). This scope's write/send tools (`notion-write`, `slack-send`) have no tool shipped yet, so every action-class below is draft-only — the scope-specific never-delegated rows (review-cycle content, exit-interview content) hold regardless of tool status.
 
 ## Cron ids bound
 

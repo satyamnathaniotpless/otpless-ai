@@ -56,9 +56,9 @@ Operator (natural language) → Harness → Skills (process) → Config (data) �
 | Runtime | When | What it gives |
 |---|---|---|
 | **Claude Code (local)** | P0–P1, development | Fastest iteration loop on skills + config; runs only while a session is open |
-| **qm (self-hosted)** | P2 onward, production | 24×7 server-side operation: crons and watches run unattended; Slack is the primary surface (founder + CTO drive it from phones); web UI for pipeline views; per-user scopes so founder and CTO each have their own workspace + shared #hiring channel context; approval gates enforced by security posture |
+| **qm (self-hosted)** | P2 onward, production | 24×7 server-side operation: crons and watches run unattended; Slack is the primary surface (founder + CTO drive it from phones); web UI for pipeline views; per-user scopes so founder and CTO each have their own workspace + shared #hiring channel context; approval gates enforced as `approvals[]` on tool descriptors (ADR-010), not a per-scope posture |
 
-qm deployment: `qm init` against our org (Fly or AWS, our account), default **Auto** security posture (content screening on), Slack plugin enabled. Skills stay in the recruiting repo and are imported into qm as a skill pack — one codebase drives both runtimes, so nothing is rewritten at the P2 cutover.
+qm deployment: `qm init` against our org (Fly or AWS, our account), content screening on (`securityScreen` in `qm.config.jsonc`), Slack plugin enabled. Skills stay in the recruiting repo and are imported into qm as a skill pack — one codebase drives both runtimes, so nothing is rewritten at the P2 cutover.
 
 - **Skills** (`.claude/skills/*/SKILL.md`) encode process: how to triage, rate, draft, schedule. Never contain personal data or IDs.
 - **Config** (`.claude/skills/recruit-config/`) encodes data: identities, templates, role playbooks, Notion IDs, stage names. Gitignored where personal (`user.md`, `jobs/*.md`), exactly like YC's repo.
@@ -234,7 +234,9 @@ Autonomy is granted per action-class, earned by measured performance, and revoca
 | **L2** (P3) | Auto-advance stages per playbook rules; send early-stage (Applied) rejections | ≥95% unedited over 4 weeks + zero candidate-facing incidents |
 | **Never delegated** | Advance-to-onsite, offers, comp discussion, any rejection after a human has met the candidate | Human judgment, permanently |
 
-One bad send demotes the action class back a level. This maps onto qm's security postures — posture can only tighten per scope, never loosen silently.
+One bad send demotes the action class back a level: the `require_approval` (or `deny`) row for that action-class is re-added to `command-policy.md` and its compiled tool-descriptor `approvals[]`, in a merged PR. A promotion is the same mechanism in reverse — a row removed, not a dial turned — so a class can only tighten per scope, never loosen silently.
+
+**Correction (2026-08-03):** this section originally said the demotion/promotion mechanism "maps onto qm's security postures." Verified against `@yc-software/qm@0.1.4`: qm has no security-posture concept. The behavior described — tighten-only, never silently loosened — still holds; the mechanism is `approvals[]` on tool descriptors, not a posture (`docs/ADRS.md` ADR-010 and its correction).
 
 ### 12.4 Self-improvement — it owns its own playbook
 

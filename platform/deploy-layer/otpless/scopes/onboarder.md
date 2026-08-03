@@ -25,9 +25,9 @@
 - WhatsApp Business API: not yet wired (Phase 3, PRD §6) — same as `recruiter` scope; agent drafts message text for manual paste; no contract file yet
 - BGV vendor (SpringVerify/OnGrid): **no contract file exists for this system** — vendor undecided (`packs/onboarding/config/vendors.md`, gate G18, `docs/gates.md`). Flagged as a capability/contract gap (a new `platform/contracts/bgv.md` is needed once a vendor is chosen), not worked around — every BGV-touching skill drafts a request for a human to submit through the vendor's own portal until then
 
-## Security posture
+## Write/send enforcement
 
-**Auto** (org default) — per `command-policy.md` §7 ("`onboarder`, `analyst`, `culture` ... inherit org default"). Employee/new-hire-facing sends are still gated per the trust ladder regardless of posture — Auto affects content screening, not the trust ladder.
+No per-scope posture dial exists (`command-policy.md` §7). This scope's write/send tools (`notion-write`, `gmail-send`) have no tool shipped yet, so every action-class below is draft-only. Employee/new-hire-facing sends still route through the trust ladder once a tool exists (§2's `require_approval` floor), and the never-delegated rows already carry a standing `deny` (§4) ahead of any tool existing.
 
 ## Cron ids bound
 

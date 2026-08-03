@@ -35,7 +35,7 @@ The actual order five agents were built in, with what blocks what:
 Everything in `packs/shared/` — imported unchanged by all five existing agents, verified by reviewers against `git diff` across every phase's commits, not builder self-report (`docs/reports/P2-lifecycle-agents.md`, `P3-department-complete.md`):
 
 - **`packs/shared/identity/`** — AI disclosure, signature format, mailbox/Slack/calendar/Notion attribution, Slack PII minimization.
-- **`packs/shared/trust-ladder/`** — the L0→L1→L2 autonomy model, enforced in qm's command policy, not convention (ADR-004).
+- **`packs/shared/trust-ladder/`** — the L0→L1→L2 autonomy model, enforced as `approvals[]` on tool descriptors compiled from `command-policy.md`, not convention (ADR-004; mechanism corrected by ADR-010).
 - **`packs/shared/metrics/`** — the draft-acceptance ledger and weekly rollup that the trust ladder promotes on (ADR-008).
 - **`packs/shared/standup/`** — daily standup + weekly self-review format.
 - **`packs/shared/retro/`** — the weekly playbook self-improvement loop (diff human edits → open a PR → human merges).

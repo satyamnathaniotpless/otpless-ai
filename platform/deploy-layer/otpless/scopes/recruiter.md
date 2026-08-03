@@ -23,9 +23,9 @@
 - Slack: `platform/contracts/slack.md`
 - WhatsApp Business API: not yet wired (Phase 3, PRD §6) — until then, agent drafts message text for manual paste; no contract file yet, add one when it lands
 
-## Security posture
+## Write/send enforcement
 
-**Auto** (org default) — per `command-policy.md` §7. Candidate-facing sends still gated per trust ladder regardless of posture (Auto affects content screening, not the trust ladder).
+No per-scope posture dial exists (`command-policy.md` §7). This scope's write/send tools (`gmail-send`, `slack-send`, `notion-write`, `calendar-invite`, `whatsapp-send`) have no tool shipped yet, so every action-class below is draft-only, not gated-and-approvable. Candidate-facing sends still route through the trust ladder once a tool exists (§2's `require_approval` floor), and the never-delegated rows already carry a standing `deny` (§4) ahead of any tool existing.
 
 ## Cron ids bound
 

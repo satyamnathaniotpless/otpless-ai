@@ -4,7 +4,7 @@
 
 ## Scope id
 
-`people-ops` — order 3 in `org-config.md` Scopes table, P2. **Starts on Strict posture per `command-policy.md` §1/§7** (org-config.md's own Scopes table already notes this).
+`people-ops` — order 3 in `org-config.md` Scopes table, P2. Performs **zero** HRMS writes today (`platform/contracts/hrms.md` — "What we write: None"); see Write/send enforcement below for what governs the day a write tool exists.
 
 ## Agent identity config pointer
 
@@ -18,14 +18,14 @@
 ## Connectors required
 
 - Notion (Policies wiki + Employees DB cross-reference): `platform/contracts/notion-employees.md` — TODO(gate): neither object exists yet (gates G16, G17, `docs/gates.md`); People-Ops is read-only against both
-- HRMS (read-only leave/attendance/employee-record queries + payroll-cutoff calendar): `platform/contracts/hrms.md` — TODO(gate): provider undecided, no credentials (gates G14, G15, `docs/gates.md`). **Strict posture (below) governs any HRMS write attempt for this scope — see Security posture.**
+- HRMS (read-only leave/attendance/employee-record queries + payroll-cutoff calendar): `platform/contracts/hrms.md` — TODO(gate): provider undecided, no credentials (gates G14, G15, `docs/gates.md`). **No HRMS write action-class exists for this scope today; see Write/send enforcement below for what governs the day one is proposed.**
 - Slack (#people): `platform/contracts/slack.md`
 - Gmail (letters drafts — employment verification, address proof; a human signatory sends): `platform/contracts/gmail.md`
 - Google Calendar: not bound yet — `packs/people-ops/config/agent.md` defers this ("add when a skill needs it"); no `people-ops` skill exercises Calendar in P2, so it is not listed as required here (ADR-005: don't bind a connector before a skill needs it)
 
-## Security posture
+## Write/send enforcement
 
-**Strict** on any HRMS write, per `command-policy.md` §1/§7 — Strict requires human approval on every write regardless of content-screening result, until that action-class earns L1 evidence. In P2 this scope performs **zero** HRMS writes: its only HRMS interaction is read-only queries plus a drafted "payroll input packet" handed to the accountable human (`platform/contracts/hrms.md` — "What we write: None"). Strict is recorded as this scope's standing posture for that action-class now, ahead of any write path existing, so the policy is already correct the day an HRMS-write action-class is ever proposed — it does not default to Auto by omission. Every other action-class this scope performs (policy Q&A, HRMS reads, letters, vendor renewals) runs on org-default **Auto**.
+There is no per-scope posture dial (`command-policy.md` §7 — "no posture, no knob"). In P2 this scope performs **zero** HRMS writes: its only HRMS interaction is read-only queries plus a drafted "payroll input packet" handed to the accountable human (`platform/contracts/hrms.md` — "What we write: None"). What actually protects this scope on the day an `hrms-write` tool exists: its destructive actions (record delete, record overwrite) are already staged as `deny` rules in `command-policy.md` §5a, and any other HRMS-write action-class this scope might propose starts at `require_approval` like every write action-class does (§2's L0 floor) until it earns L1 on measured evidence. That is already correct the day a write path appears — it does not default to permissive by omission. Every other action-class this scope performs (policy Q&A, HRMS reads, letters, vendor renewals) is draft-only today; no write/send tool has shipped for it yet.
 
 ## Cron ids bound
 
@@ -48,7 +48,7 @@ The slug column is the canonical action-class vocabulary — it must match `pack
 | Letter draft (employment verification, address proof, ...) | `letter_draft` | L0 | Always requires a human signatory regardless of level — promotion affects draft-to-signatory speed, never removes the signature step |
 | Payroll input packet (to accountable human, ahead of HRMS cutoff) | `payroll_input_packet` | L0 (internal coordination, not an external send) | Never promotes to an HRMS write — P2 hard scope limit per `platform/contracts/hrms.md`; revisit only after the HRMS provider decision (gate G14) and a written ADR |
 | Vendor renewal notice/reminder | `vendor_renewal_notice` | L0 | Any spend/contract commitment is a human gate (CLAUDE.md autonomy & human gates) regardless of trust-ladder level |
-| HRMS write of any kind | n/a | **NOT IN SCOPE (P2)** | Not an action-class this scope performs at all, so no evidence accumulates — distinct from a never-delegated hard deny, which is a permanent policy rule rather than a pending-decision scope limit. **Strict posture is the standing backstop** (`command-policy.md` §1/§7) for the day a write path is ever proposed; revisit only when Keka vs RazorpayX is decided (gate G14) and a written ADR supersedes this line |
+| HRMS write of any kind | n/a | **NOT IN SCOPE (P2)** | Not an action-class this scope performs at all, so no evidence accumulates — distinct from a never-delegated hard deny, which is a permanent policy rule rather than a pending-decision scope limit. **`command-policy.md` §5a's staged `deny` rules against `hrms-write`** are the standing backstop for the day a write path is ever proposed; revisit only when Keka vs RazorpayX is decided (gate G14) and a written ADR supersedes this line |
 | Offers / comp / terminations / performance judgments / post-interview rejections / policy changes | n/a | NEVER DELEGATED | Hard deny, `command-policy.md` §4, all postures, all levels |
 
 ## Accountable human

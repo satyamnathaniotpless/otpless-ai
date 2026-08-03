@@ -24,9 +24,9 @@ The Analyst's own pack config path (expected shape: an `agent.md` under that pac
 - Slack (`#people`): `platform/contracts/slack.md` — every report this scope posts is aggregate counts/rates only, never a named or individual figure (see PII note below)
 - Google Calendar / Gmail: not bound — no analyst action-class exercises either in P3, so neither is listed as required here (ADR-005: don't bind a connector before a skill needs it), matching the pattern `people-ops.md` already set for Calendar
 
-## Security posture
+## Write/send enforcement
 
-**Auto** (org default) — per `command-policy.md` §7 ("`onboarder`, `analyst`, `culture` ... inherit org default"). Auto affects content screening, not the trust ladder below; every action-class still starts at L0.
+No per-scope posture dial exists (`command-policy.md` §7). This scope has no write tool at all — it is read-only reporting per §7's own scope table — so every action-class below starts, and stays, at L0 until a post/write tool exists and earns a row.
 
 ## Cron ids bound
 

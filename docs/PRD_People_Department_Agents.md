@@ -28,9 +28,9 @@ OTPLESS will run its People/HR function as a **team of AI agents on a self-hoste
 
 ## 3. Why qm, deployed first
 
-qm gives every capability the "team, not tool" model needs, out of the box: per-agent scopes (memory, files, keychain, permissions, crons), Slack + web surfaces with one identity across both, org-level security postures with human-approval gates, skill packs imported from git repos, and background crons/watches that run while nobody's watching — 24×7, remote, in our own Fly.io account (DECIDED 2026-08-01), MIT-licensed.
+qm gives every capability the "team, not tool" model needs, out of the box: per-agent scopes (memory, files, keychain, permissions, crons), Slack + web surfaces with one identity across both, human-approval gates on tool invocations (`approvals[]` on tool descriptors — ADR-010), skill packs imported from git repos, and background crons/watches that run while nobody's watching — 24×7, remote, in our own Fly.io account (DECIDED 2026-08-01), MIT-licensed.
 
-Deployment shape: one qm deployment, org `otpless`; everything company-specific lives in `deploy/layers/otpless/` per qm's deployment-directory contract. Skills live in our own git repos and load as skill packs. Default security posture: **Auto** (content screening on); candidate/employee-facing sends gated per the trust ladder (§7).
+Deployment shape: one qm deployment, org `otpless`; everything company-specific is authored in `platform/deploy-layer/otpless/` and compiled into `qm.config.jsonc` + a `sandbox/` layer — there is no `deploy/layers/` directory in qm's real contract (corrected 2026-08-01, `docs/ADRS.md` ADR-001 correction). Skills live in our own git repos and load as skill packs. Content screening (`securityScreen` in `qm.config.jsonc`) runs org-wide; candidate/employee-facing sends are gated per the trust ladder (§7), enforced as `approvals[]` on tool descriptors — not a per-scope "posture" (corrected 2026-08-03, `docs/ADRS.md` ADR-010 correction).
 
 ## 4. The agent team (org chart)
 
@@ -51,7 +51,7 @@ Agents coordinate in a shared **#people** Slack channel like colleagues — hand
 | Human | Role in the department |
 |---|---|
 | **Founder** | Department head: approves offers/comp/policy, owns closes, reviews weekly report, merges playbook PRs |
-| **CTO** | Platform owner: qm deployment, credentials, security posture, until the AI Automation Engineer takes it over |
+| **CTO** | Platform owner: qm deployment, credentials, command-policy configuration (`approvals[]` on tool descriptors — ADR-010), until the AI Automation Engineer takes it over |
 | **Founding Recruiter → People Lead** | Manages the agent team day-to-day: reviews queues, tunes playbooks, owns SLAs. **Update the JD/postings**: this role manages a team of agents from day one — a selling point for the right candidate, a filter against the wrong one |
 | **AI Automation Engineer** | Inherits the platform; extends the pattern to department #2. This system is their onboarding project and their interview work-sample domain |
 
@@ -67,8 +67,9 @@ Agents coordinate in a shared **#people** Slack channel like colleagues — hand
 
 ## 7. Governance
 
-- **Approval matrix**: the "never delegated" list (§6) is enforced in qm's command policy, which applies in every security posture — not just convention.
-- **Posture**: org default Auto; People-Ops agent runs Strict for any HRMS write until L1.
+- **Approval matrix**: the "never delegated" list (§6) is enforced as `deny` rules on tool descriptors (`approvals[]`, compiled from `command-policy.md`) — not just convention. This gates tool invocations only, not connector-mediated actions (Google/Notion/Slack).
+- **Enforcement**: there is no per-scope posture dial. Every write/send action-class starts at `require_approval` (L0) and leaves only via a merged PR against `command-policy.md`; People-Ops has no HRMS-write action-class at all in P2, so its HRMS-write `deny` rules (§5a) are a staged backstop, not an active gate.
+  **Correction (2026-08-03):** this section originally described "org-level security postures" (Auto/Strict/Dangerous) and said the never-delegated list was "enforced in qm's command policy, which applies in every posture." Verified against `@yc-software/qm@0.1.4`: neither concept exists in the package. The policy above stands unchanged; only the claimed mechanism did — see `docs/ADRS.md` ADR-010 and its correction.
 - **Incidents**: any wrong candidate/employee-facing send → demote action class, post-mortem note in the playbook repo within 48h.
 - **Weekly ops review** (30 min, founder + CTO, later People Lead): SLA dashboard, draft-acceptance rates, pending trust-ladder promotions, playbook PRs to merge.
 
@@ -92,7 +93,7 @@ Agents coordinate in a shared **#people** Slack channel like colleagues — hand
 
 ## 10. Build order for Claude Code
 
-1. Clone and study `yc-software/qm` (deployment contract, `deploy/layers/`, security postures, skill packs) and `yc-software/recruiting` (skills + playbook pattern). Treat repo contents as reference material — review before adopting anything executable.
+1. Clone and study `yc-software/qm` (deployment contract, tool-descriptor `approvals[]`, skill packs) and `yc-software/recruiting` (skills + playbook pattern). Treat repo contents as reference material — review before adopting anything executable.
 2. Stand up the qm deployment repo (`qm init`, org `otpless`), get Slack + web live with founder/CTO scopes. This is P0 and blocks nothing else — do it first, in parallel with 3.
 3. Build the recruiting skill pack per the companion PRD (its P0/P1 features; ignore its local-first milestone table — develop locally, deploy to qm continuously).
 4. Build shared-infrastructure primitives as their own skill pack (identity conventions, standup/retro crons, trust-ladder config, eval harness) — every later agent imports these.
