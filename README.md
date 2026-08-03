@@ -1,4 +1,4 @@
-# OTPLESS AI Workforce Platform
+# Otto — OTPLESS AI Workforce Platform
 
 > **Do not run `fly launch` (or any source-build deploy) against this repository.** It fails with
 > *"Could not find a Dockerfile, nor detect a runtime or framework from source code"* — correctly.
@@ -8,7 +8,9 @@
 > itself. The deployment lives in a **separate directory** created by `qm init`, and goes live via
 > `qm up`. Start at `docs/RUNBOOK_DEPLOY.md` §2 — not at Fly's quickstart.
 
-The custom agent harness and agent workforce for OTPLESS. One platform, hundreds of scoped agents over time, organized like a company: departments → agents → skills → config. HR/People is department #1 (greenfield, urgent, high-volume); the Recruiter agent is employee #1.
+**Naming:** Otto is OTPLESS's agent platform — what this repo builds and what the company runs. qm is the open-source harness Otto runs on, the same way a cluster runs on Kubernetes without becoming Kubernetes. Every CLI command, config file, and package name (`qm up`, `qm.config.jsonc`, `@yc-software/qm`) stays `qm` — if you're searching for help or reading upstream docs, `qm` is the name to look for, not Otto.
+
+Otto is OTPLESS's custom agent harness and agent workforce. One platform, hundreds of scoped agents over time, organized like a company: departments → agents → skills → config. HR/People is department #1 (greenfield, urgent, high-volume); the Recruiter agent is employee #1.
 
 **This is permanent infrastructure.** The current 7-hire sprint is the commissioning run. The platform's product is: any new role, workflow, or department becomes a config change plus a skill pack — never a new system.
 
@@ -32,7 +34,7 @@ We adopt [yc-software/qm](https://github.com/yc-software/qm) (MIT) as the harnes
 | `platform/contracts/` | Integration contracts for Notion, Gmail, Calendar, Slack — consumed by skills; `_template.md` for new connectors |
 | `platform/evidence/` | Draft-acceptance evidence: README (schema, formula, promotion decision table), `_rollup-template.md` for weekly rollups (counts only) |
 | `platform/scripts/` | Deployment automation: bootstrap-qm.sh (preflight + provisioning), verify-deployment.md (checklist) |
-| `platform/deploy-layer/otpless/` | Everything org-specific for the qm deployment (config, command policy, sandbox additions) |
+| `platform/deploy-layer/otpless/` | Everything org-specific for Otto (config, command policy, sandbox additions) |
 | `packs/shared/` | Generic agent-infrastructure skill pack: identity, standup, retro, trust ladder — every agent imports this |
 | `packs/recruiting/` | Department #1, agent #1: full hiring loop skills + per-role job playbooks (generic `_template.md` — any future role is one file) |
 | `packs/onboarding/` | Department #2, agents #2–3: 10 skills (notice-period warmth, BGV, paperwork, provisioning, day-one, buddy, 30/60/90 checkins, hire-status, watch, router) + per-role onboarding checklists |
@@ -59,6 +61,7 @@ We adopt [yc-software/qm](https://github.com/yc-software/qm) (MIT) as the harnes
 - [x] Measurement layer: draft-acceptance evidence, promotion arithmetic, operator manual (evals x10)
 - [x] Onboarder + People-Ops packs built (not live — gates G1–G9, G14–G19)
 - [x] Analyst + Culture & Growth packs built, WhatsApp contract (not live — gates G1–G9, G14–G25)
-- [x] qm deployment live — Fly.io `sin`, 5 services healthy, Postgres + Tigris, portal at `otpless-portal.fly.dev` (2026-08-02). Sandbox runs qm's demo skill; **our packs are not loaded yet**
-- [ ] Recruiter agent on qm, trust ladder L0 → L1
+- [x] Otto live — Fly.io `sin`, 5 services healthy, Postgres + Tigris, portal at `otpless-portal.fly.dev` (2026-08-02)
+- [x] Recruiting packs loaded onto Otto — deployment layer v6: 15 skills (shared + recruiting), integration contracts, and per-deployment `user.md`. Agent named **Scout** (G8 closed)
+- [ ] Recruiter agent proven in shadow mode, trust ladder L0 → L1 — blocked on a real triage run and the enforcement re-founding (ADR-004 describes a command policy qm does not have)
 - [x] Department automation playbook (`docs/DEPARTMENT_AUTOMATION_PLAYBOOK.md`) — template out to department #2, recommendation: support

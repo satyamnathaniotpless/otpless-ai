@@ -1,4 +1,4 @@
-# Deploy Runbook — qm platform for OTPLESS
+# Deploy Runbook — Otto, OTPLESS's agent platform (built on qm)
 
 Everything an agent can't do alone lives here. Total human time: ~2–3 hours once.
 
@@ -19,6 +19,8 @@ Live status of every item below (owner, workaround, what's actually blocking): `
 | 9 | Web sign-in (built-in `auth` broker): admin email address, a verified sender, and a Resend API key or SMTP credentials | CTO | qm emails one-time sign-in links; CLI wires the rest. (External IdP instead: drop `"auth"` from services and register `<publicUrl>/auth/callback` exactly) |
 | 10 | Provider: **Fly.io — DECIDED (2026-08-01)**, binding per deployment directory | CTO | Create the Fly.io org + billing; slug `otpless` is local, not globally unique |
 | 11 | Node.js runtime **>= 24** on every machine that runs qm CLI commands (`bootstrap-qm.sh`, `deploy-qm` skill, any operator machine) | CTO | qm hard-refuses to run below Node 24 — this is a genuine blocker to `qm init`/`setup`/`check`/`plan`/`up`, not a footnote. Gate `G26` in `docs/gates.md` |
+
+**Branding note on item 6:** qm exposes no display-name/brand config key, so the Otto name does not propagate automatically. `qm slack render` generates `slack-app-manifest.yml` with `name: qm`, `display_name: qm` every time it runs, so editing that file is not durable — rename the Slack app to Otto in Slack's own UI *after* creation instead. The portal/admin UI chrome is baked into qm's images and is out of scope for a rename without adopting the private fork (ADR-001); that trade-off is a deliberate non-goal, not a gap in this runbook.
 
 ## 2. Stand up qm (agent-executable once #1 is done)
 

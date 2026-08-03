@@ -11,7 +11,7 @@ The roadmap is finished when P4 ships. The platform is not. This is the standing
 | Duty | Cadence | Done means |
 |---|---|---|
 | **Eval watch** | Every change, and daily once crons run | `node evals/run.mjs` green. A red eval is stop-the-line: fix it before anything else, and never adjust an assertion to make a failing build pass. If a check is genuinely wrong, say so explicitly and justify the change in the commit. |
-| **qm health** | Daily once live | Crons fired on schedule; the 08:30 IST digests posted; no scope stuck. A cron that silently did not run is the failure mode to look for — absence of an error is not evidence it ran. |
+| **Otto health** | Daily once live | Crons fired on schedule; the 08:30 IST digests posted; no scope stuck. A cron that silently did not run is the failure mode to look for — absence of an error is not evidence it ran. |
 | **Per-agent retro** | Weekly (Sunday 22:00 IST cron, after the 21:00 rollup) | Playbook PRs opened where human edits show a pattern. Humans merge; the agent never self-merges (ADR-004). |
 | **Evidence rollup review** | Weekly, at the ops review | Each agent's rollup read; any action-class clearing its gate has a promotion PR to merge or decline (`platform/evidence/README.md`, ADR-008). |
 | **Upstream qm merge** | Monthly | We depend on the published `@yc-software/qm` package rather than a fork (ADR-001 and its 2026-08-01 correction), so "merging upstream" today means bumping that dependency in the deployment directory and re-running `qm check` / `qm plan` before `qm up`. Our material lives in `qm.config.jsonc` and `sandbox/` — there is no `deploy/layers/` to conflict in. Revisit only if we ever adopt the private fork. |

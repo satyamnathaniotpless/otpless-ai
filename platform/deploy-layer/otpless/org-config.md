@@ -6,6 +6,7 @@
 
 | Field | Value |
 |---|---|
+| Platform name | **Otto** — OTPLESS's agent platform; runs on the qm harness (`yc-software/qm`). See the naming note in `README.md` — commands, config files, and the package name stay `qm`. |
 | Org slug | `otpless` |
 | Timezone | `Asia/Kolkata` (IST) — all crons (standup 08:30 IST, digests, retros) are scheduled against this |
 | Currency (for any config that needs one) | INR (₹), LPA convention for comp bands |

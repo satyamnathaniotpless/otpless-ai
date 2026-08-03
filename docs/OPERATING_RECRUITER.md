@@ -84,7 +84,7 @@ An existing example of a filled role file (for reference when writing a new one)
 
 State these plainly to anyone new to the system — none of them are hidden, and none should be assumed fixed without checking `docs/gates.md`:
 
-- **The deployment is not live.** qm hasn't been stood up yet — nine human-gated prerequisites (G1–G9) are still open, tracked in `docs/gates.md`. Until they close, this system runs only in a local Claude Code session, not 24×7 on qm.
+- **The deployment is not live.** Otto hasn't been stood up yet — nine human-gated prerequisites (G1–G9) are still open, tracked in `docs/gates.md`. Until they close, this system runs only in a local Claude Code session, not 24×7 on Otto.
 - **The Gmail connector can draft, not send.** The available Gmail MCP surface is draft/label/read only — there is no send operation. Every "approved send" today still means a human clicks send in Gmail. This is gate G13 in `docs/gates.md`, and the underlying policy is `docs/ADRS.md` ADR-007: the fix is extending the MCP with a real send capability, never a workaround (raw HTTP, headless browser, or sending from a human's own mailbox).
 - **Slack reactions are not an approval mechanism.** Covered in §2 above — restated here because it is the single most common wrong assumption a new operator makes. See `docs/ADRS.md` ADR-006.
 - **WhatsApp is Phase 3.** Candidate channel preference is WhatsApp over email (`packs/recruiting/config/user.md`), but the WhatsApp Business API isn't wired yet. Until it is, the agent drafts the message text and a human copies/pastes it manually — same `d/s/e/?` gate as email.

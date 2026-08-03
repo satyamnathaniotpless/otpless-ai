@@ -19,6 +19,11 @@ Agents may state these facts verbatim in outreach, replies, and Q&A. Agents must
 - **Founded:** {FILL-BEFORE-USE: founding date/year}
 - **Funding stage:** {FILL-BEFORE-USE: current stage, if agents are ever asked and a public answer exists}
 
+## Platform
+
+- **Name:** Otto — "OTPLESS centralized multiplayer agent." Otto is OTPLESS's agent platform; qm is the open-source harness (MIT, `yc-software/qm`) Otto runs on. Commands, config file names, and the package name stay `qm` — see the naming note in `README.md`.
+- **Branding limits (verified):** qm exposes no display-name/brand config key — checked against the recognised `qm.config.jsonc` keys. The Slack app name is renameable, but only durably in Slack's UI after app creation: the generated `slack-app-manifest.yml` (`name: qm`, `display_name: qm`) is overwritten every time `qm slack render` runs, so editing that file directly does not stick. The portal and admin UI chrome are baked into qm's images; changing them would require adopting the private fork (ADR-001) and forfeiting cheap upstream merges — this is a deliberate non-goal, not an oversight.
+
 ## Rules for use
 
 - Placeholders marked `{FILL-BEFORE-USE: ...}` are not facts — an agent encountering one must not answer the underlying question with an invented figure. It should say it doesn't have a confirmed number and offer to escalate to a human, or simply omit the claim if it isn't essential to the message.
