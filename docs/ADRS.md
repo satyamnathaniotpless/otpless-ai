@@ -264,3 +264,26 @@ The naive repair — switch the rows to `match_type: command` — is a trap, and
 | `qm check` / `qm sandbox publish` | Deployment directory | **The backstop that cannot be bypassed.** qm refuses a bad descriptor outright. |
 
 So a drifted native check cannot ship a broken rule to production — it can only fail to warn early. That is an acceptable trade for keeping this repo dependency-free, but it is a trade, not a free lunch.
+
+### 6. Addendum (2026-08-03) — `qm rollback` proven, and it covers only half the surface
+
+`qm rollback --to <digest>` was the last unproven precondition in `docs/proposals/platform-agent.md`. It is now proven, by executing it against the live deployment rather than reading the CLI help.
+
+**Method.** Recorded the running image (A = `…66816a6e`), published a benign variant to get a second *functional* image (B = `…98c65315`) — deliberately breaking production was unnecessary — confirmed core booted B, ran `qm rollback --to sha256:<A>`, then confirmed via `printenv FLY_BASE_IMAGE` on `otpless-core` that the **running service** was back on A. It was. The config pin was rewritten to match, and `verify-live-layer.mjs` stayed green throughout.
+
+**The limitation, which is the important part.** On the Fly target, `qm rollback` repoints the **sandbox image** and nothing else. The **deployment layer is not rolled back** — the layer stayed at v9 across both publishes and the rollback, untouched.
+
+That matters because **our guardrails live in the layer, not the image.** Skills and tool descriptors — including every `approvals[]` rule the never-delegated list compiles into — travel in the versioned layer. So:
+
+> `qm rollback` cannot undo a bad guardrail publish. It undoes a bad *binary*.
+
+The recovery path for a bad layer is different and must be stated explicitly: **re-publish the previous content from git.** That works only because `command-policy.md`, the packs, and the compiler are all version-controlled here, which makes "the authored source lives in git" a recovery guarantee rather than a tidiness preference. `verify-live-layer.mjs` is what tells you the two have diverged.
+
+**Consequence for the platform agent.** Its "never deploy without a verified rollback path" constraint needs splitting in two:
+
+| Change | Undo mechanism | Proven |
+|---|---|---|
+| Sandbox image (tool binaries) | `qm rollback --to <digest>` | Yes, today |
+| Deployment layer (skills, `approvals[]`) | Re-publish prior content from git, verified by `verify-live-layer.mjs` | Mechanism exists and is exercised daily by normal publishes; not yet drilled as a deliberate recovery |
+
+So the honest status is: image rollback is proven, layer recovery is plausible-but-undrilled. An agent granted publish rights should be restricted to the image path until a layer-recovery drill is run, or held at PR-only for layer changes — which is what the proposal already recommends for other reasons.

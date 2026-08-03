@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.3.0 — 2026-08-03 · qm rollback proven; the security-posture fiction removed
+
+- **`qm rollback --to <digest>` proven against the live deployment** and verified on the running service, not from CLI help. Method and result in `docs/ADRS.md` ADR-010 correction §6. Tested with two *functional* images rather than by breaking production.
+- **The limitation matters more than the success:** rollback repoints the sandbox **image** only. The deployment layer does not roll back — and our guardrails (`approvals[]`, skills) live in the layer. So rollback cannot undo a bad guardrail publish; recovery there is re-publishing prior content from git, verified by `verify-live-layer.mjs`. That mechanism exists but has never been drilled.
+- **`packs/shared/trust-ladder/SKILL.md` corrected and republished (layer v9)** — it was live and telling every agent its autonomy was "enforced by qm's command policy," a mechanism qm does not have. It now names the real one and states two things it never had: `approvals` do not gate connector actions, and **absence of a rule means ungated, not L0**.
+- Auto/Strict/Dangerous "security postures" removed across 14 files (both PRDs with dated correction notes, all five scope files, runbooks, plans, layer README, `agents/integrator.md`). `platform/deploy-layer/otpless/scopes/people-ops.md` was a substantive rework — it assigned a standing "Strict" posture that does not exist and therefore protected nothing.
+- `brain/decisions/log.md` records the ADR-004 → ADR-010 supersession without rewriting the original row.
+- **`docs/proposals/platform-agent.md`**: both blockers cleared or reduced; recommendation moves to *buildable*, with layer changes PR-only permanently. The deciding objection is now volume — the "count the publishes after a month" test has not been allowed to run.
+- Decisions: where a constraint is invariant, generate it rather than asking an author to remember it; `qm check`/`publish` is the backstop that cannot be bypassed, native checks are early warning.
+
 ## v1.2.0 — 2026-08-03 · Enforcement re-founded on real qm mechanisms
 - Safety model rebuilt on mechanisms qm actually has, after finding it was documented against a "command policy" and "security postures" qm does not implement.
 - `platform/deploy-layer/otpless/command-policy.md` rewritten as a compilation source (`<!-- policy-table -->` blocks, policy as data) and `platform/scripts/build-tool-policy.mjs` (new) compiles it into qm `approvals[]` descriptors — 22 `deny` rules staged across six write tools that do not exist yet (`gmail-send`, `notion-write`, `slack-send`, `calendar-invite`, `whatsapp-send`, `hrms-write`).

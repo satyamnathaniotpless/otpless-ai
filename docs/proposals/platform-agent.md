@@ -69,8 +69,8 @@ The first two are not "high-trust actions requiring approval." They are actions 
 
 Four things, and the first two are current blockers rather than objections:
 
-1. **The enforcement model is unimplemented.** ADR-004 describes a command policy qm does not have. Building a self-modifying agent on top of a safety model we have just discovered is prose would be exactly backwards. **This must land first.**
-2. **Rollback is unproven.** `qm rollback --to <digest>` exists in the CLI. Nobody has run it. An agent with deploy rights and an untested undo is a bad trade at any volume.
+1. ~~**The enforcement model is unimplemented.**~~ **CLEARED 2026-08-03.** Re-founded on `approvals[]` (ADR-010 and its correction), compiled by `platform/scripts/build-tool-policy.mjs`, verified live by `platform/scripts/verify-live-layer.mjs`. One caveat that did not exist when this was written: **`approvals` gate tool invocations only** — they cannot reach a connector-mediated action, so an agent restricted by them is restricted only where it acts through tools we own.
+2. ~~**Rollback is unproven.**~~ **PARTIALLY CLEARED 2026-08-03.** `qm rollback --to <digest>` was run against the live deployment and verified on the running service (ADR-010 correction §6). But it repoints the **sandbox image only** — the deployment layer does not roll back, and **our guardrails live in the layer.** So `qm rollback` cannot undo a bad `approvals[]` publish; recovery there is re-publishing prior content from git, a mechanism that exists but has never been drilled as a deliberate recovery. **This agent must therefore be PR-only for layer changes regardless of trust level**, which is stricter than "requires approval" and stricter than what this document originally proposed.
 3. **The volume may not justify it.** Six publishes happened during a commissioning push. In steady state it might be one a week, which a human does in five minutes. The honest test: after a month of normal operation, count the publishes. If it is fewer than three a week, this is a script and a cron, not an agent.
 4. **It concentrates risk.** Today, platform changes require a human in the loop by construction — there is no other path. This proposal removes that property deliberately. That is the trade being made, and it should be made consciously rather than as a side effect of wanting convenience.
 
@@ -79,5 +79,14 @@ Four things, and the first two are current blockers rather than objections:
 **Build it, but not yet, and not first.**
 
 Order: land the enforcement re-founding; prove `qm rollback` against a deliberately broken layer; then build this pack starting at L0 on every action-class, PR-only, with the never-delegated additions above expressed as `deny` rules rather than instructions.
+
+### Status update — 2026-08-03
+
+Both original blockers are cleared or reduced, so the ordering above is satisfied and the recommendation moves from "not yet" to **buildable, with two constraints tightened by what clearing them taught us**:
+
+1. **PR-only for deployment-layer changes, permanently** — not as a starting trust level but as a standing constraint, because `qm rollback` does not cover the layer (blocker 2 above). Image publishes may eventually be automated; guardrail publishes may not.
+2. **`approvals` are not a sufficient cage on their own.** They gate tool invocations, not connector actions. Any capability this agent holds via a connector is ungoverned by the mechanism we just built, so its connector grants matter more than its `approvals` rules.
+
+The third original objection stands and is now the deciding one: **the volume may not justify it.** The honest test written above was "after a month of normal operation, count the publishes; fewer than three a week and this is a script and a cron." That month has not elapsed — the deployment went live 2026-08-02. **The test should be allowed to run before the pack is built**, which is a stronger reason to wait than either of the blockers that just cleared.
 
 If after a month the publish volume is low and the eval reds are rare, do not build it — take the script and the cron, and keep the human. The strongest version of this proposal is the one willing to conclude that.
