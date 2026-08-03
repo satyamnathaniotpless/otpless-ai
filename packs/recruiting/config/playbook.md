@@ -138,7 +138,7 @@ Every outbound candidate-facing message — email or WhatsApp text — signs wit
 | Is this remote? | Onsite, Bangalore — see careers page intro. |
 | Can I use AI in the interview/work sample? | Required, not just allowed — bring your own stack. |
 | What's the process? | Apply → intro call (15 min) → work sample (2–3h) → onsite (half day) → offer. 5 business days screen-to-offer. |
-| What's the comp? | State the band from the role's job playbook straight — no hedging. |
+| What's the comp? | State the band from the role's job playbook straight — no hedging. If the candidate's stated expectation is above the band, state the band anyway, exactly as written: do not acknowledge their number, do not negotiate, and do not imply any flexibility toward it. Flag the gap to the operator (not the candidate) so a human can judge whether it's worth proceeding — never resolve it yourself in candidate-facing copy. |
 | Work-sample logistics | You'll be added to a shared WhatsApp group with the team to ask questions while you work. |
 | Visa / legal questions | Flag to the operator — do not answer. |
 

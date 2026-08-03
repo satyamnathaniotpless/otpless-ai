@@ -615,8 +615,12 @@ if (crossRefMissing === 0) {
 console.log("\n=== 8. RATING FIXTURES ===\n");
 
 function applyRules(a) {
-  if (a.hasArtifactLink && a.artifactSubstantive) return "advance";
-  if (a.fraudDepth === "strong") return "advance";
+  // A strong Q1/Q4 signal auto-advances past the role's *soft* strong-signals list, but
+  // never past a stated *hard* requirement (packs/recruiting/config/jobs/<role>.md) — see
+  // review-applicants/SKILL.md step 4. A hard-requirement miss routes to "dig" (human
+  // judgment), never a plain auto-advance and never an auto-reject on its own.
+  if (a.hasArtifactLink && a.artifactSubstantive) return a.hardRequirementMiss ? "dig" : "advance";
+  if (a.fraudDepth === "strong") return a.hardRequirementMiss ? "dig" : "advance";
   if (!a.hasArtifactLink && !a.fraudDepth) return "reject";
   if (a.mlNotebooksOnly) return "reject";
   if (a.sdkRoleAppOnly && !a.exceptionalSlope) return "reject";

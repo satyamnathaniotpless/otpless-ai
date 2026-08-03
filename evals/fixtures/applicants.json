@@ -182,8 +182,9 @@
     "mlNotebooksOnly": false,
     "sdkRoleAppOnly": false,
     "exceptionalSlope": false,
-    "expected": "advance",
-    "note": "SHADOW-02 strong-but-wrong-stack archetype: backend.md's hard requirement is Java/Go/Node; this candidate's substantive artifact is Ruby/Rails. Rule 1 auto-advances 'regardless of other signals' per review-applicants/SKILL.md line 26, so a hard-requirement stack mismatch never blocks or even flags the advance."
+    "hardRequirementMiss": true,
+    "expected": "dig",
+    "note": "SHADOW-02 strong-but-wrong-stack archetype: backend.md's hard requirement is Java/Go/Node; this candidate's substantive artifact is Ruby/Rails, so hardRequirementMiss=true. FIXED post-SHADOW-01: rule 1 no longer auto-advances 'regardless of other signals' past a hard-requirement miss (review-applicants/SKILL.md step 4) — expected changed from 'advance' to 'dig' as part of that fix, not a pre-existing fact this fixture always asserted. Human judges whether the strong artifact is worth a call despite the stack mismatch."
   },
   {
     "id": "SHADOW-03",
@@ -279,6 +280,6 @@
     "sdkRoleAppOnly": false,
     "exceptionalSlope": false,
     "expected": "dig",
-    "note": "SHADOW-08 generic-AI-answer archetype: backend.md's own auto-reject list names 'generic AI-written answers with no specifics' as disqualifying, but no field in this fixture schema (or in applyRules() in run.mjs) can represent that signal — the mechanical rule can only fall through to 'dig' here, silently under-enforcing a documented auto-reject criterion. See SHADOW-01-synthetic-triage.md top finding."
+    "note": "SHADOW-08 generic-AI-answer archetype: backend.md's own auto-reject list names 'generic AI-written answers with no specifics' as disqualifying, but no field in this fixture schema (or in applyRules() in run.mjs) can represent that signal, so the mechanical rule falls through to 'dig' here. FIXED post-SHADOW-01 as a documentation fix, not a schema fix: review-applicants/SKILL.md step 5 now says explicitly that this one auto-reject signal is judgment-only and is not mechanically enforced, so a reader can no longer mistake this fixture's 'dig' result for the mechanical rule having covered it — a real Scout run is expected to read the answers and reject directly per the skill, independent of this fixture. Expected value intentionally left at 'dig' (unchanged) because that's what the mechanical schema honestly yields; adding a boolean here and wiring a rule to flip this specific fixture to 'reject' was considered and rejected, since the brief scoping this fix requires no existing fixture's expected outcome to change as a side effect of adding a field."
   }
 ]

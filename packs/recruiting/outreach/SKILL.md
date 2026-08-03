@@ -24,7 +24,7 @@ description: |
 1. Check Gmail for any existing thread with this candidate. If one exists, stop and route to `../reply` instead.
 2. Read `../config/jobs/<role>.md` for hook patterns and comp band.
 3. Write one sentence hooking on something SPECIFIC the candidate built — never generic. Follow the role's hook patterns.
-4. Draft using the role's template and `../config/playbook.md` tone rules: peer-builder tone, not recruiter tone; if the candidate stated a preference (comp, location, timeline), weave it in, never contradict it.
+4. Draft using the role's template and `../config/playbook.md` tone rules: peer-builder tone, not recruiter tone. If the candidate stated a **logistics** preference (location, timeline), weave it in, never contradict it. **Comp is scoped out of that "never contradict" rule, deliberately:** always state the band from the role's job playbook straight, per `../config/playbook.md`'s comp Q&A row — even when it contradicts a candidate's stated expectation. Never soften, hedge around, or imply flexibility toward a number above the band; if the candidate's stated expectation exceeds the band, say the band plainly and flag the gap to the operator rather than papering over it in the draft. A comp commitment, implied or explicit, is never-delegated — this rule exists so "never contradict a stated preference" can't be read as license to create one.
 5. Check Calendar for a proposable time within the default block (`../config/user.md`) before drafting a specific ask.
 6. Present the draft with the standard action prompt (never send unapproved):
 ```

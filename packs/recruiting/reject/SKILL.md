@@ -38,4 +38,6 @@ One draft, headed by the candidate's current stage and which template tier appli
 
 ## Failure behavior
 
-If the candidate is past Onsite (met a human), flag this as a **never-delegated** decision per the trust ladder — draft only, do not imply any autonomy to send without explicit human review of both the decision and the wording.
+The never-delegated boundary is **whether a human has met the candidate on any call or debrief, at any stage** — not any single named stage. Per this pipeline (`../config/playbook.md`), that means: **Intro call, Work-sample/technical debrief, Onsite, or later** — a human has met the candidate at every one of these, including Intro call, which happens before Work-sample and Onsite. If the candidate is at or past Intro call, flag this as a **never-delegated** `post_interview_rejection` (per `packs/shared/trust-ladder/SKILL.md` and `platform/deploy-layer/otpless/command-policy.md`): draft only, do not imply any autonomy to send without explicit human review of both the decision and the wording, and never let anything downstream present this as sendable without that review.
+
+The one class this does *not* cover: a rejection at **Applied / Pre-screen**, before any call has happened — nobody has met the candidate yet, so this is the separate, promotable `applied_stage_rejection` class. That promotability stops the moment a call has occurred; it never extends one stage further just because the call was "only" an Intro call rather than Onsite.
