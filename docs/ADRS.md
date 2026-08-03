@@ -237,3 +237,30 @@ The presence check (`command -v` for each declared binary, failing the build) me
 - The policy compiler proceeds on `approvals`. `decision` values are contract; the mapping is sound.
 - `egress[]` is downgraded from control to documentation. Anywhere our docs treat it as enforcement, fix it.
 - Live state is now checkable, and that check is `platform/scripts/verify-live-layer.mjs`. Comparing our documents against each other is what produced four consecutive mechanism errors; comparing them against the running system is the fix.
+
+### 5. Addendum (same day) — the compiler's first output would have been rejected by qm
+
+Recorded because it is the fourth mechanism error in this project, it was found the way the previous three should have been, and the fix changed a design decision.
+
+A fresh reviewer, briefed to attack claims rather than compare documents, found that **all nine authored `deny` rules would have been refused by qm at publish time.** They were written as `match_type: pattern` with values like `--category offer`, and qm requires an explicitly-authored pattern to be anchored to its own tool's binary. Confirmed by calling qm's own `parseToolDescriptor`:
+
+```
+approvals[0].pattern must refer to its own tool binary by starting with
+\bgmail-send\b and may not use a top-level alternative
+```
+
+This constraint is documented in ADR-010 above — we had written it down and then not compiled against it. The eval added earlier that day checked that the never-delegated six compile to `deny`; it did not check that the result was publishable. **A guardrail that qm refuses to load is worse than no guardrail, because the policy file reads as though it is in force.**
+
+The naive repair — switch the rows to `match_type: command` — is a trap, and was tested rather than assumed. qm accepts it, then compiles `command: "--category offer"` to `\bgmail-send\s+--category\s+offer(?:\b|(?=\s|$))`, which matches only when the flag is the token *immediately* after the binary. A realistic `gmail-send --to alice --category offer` would not match, and the rule would be silently inert. That is strictly worse than a publish-time rejection: it looks like enforcement and is not.
+
+**The design decision that followed.** The anchor `\b<tool-id>\b` carries no information — every rule must be anchored to its own tool, always — so it is pure boilerplate an author can only get wrong. The compiler now **synthesises** it: a row supplies the *discriminator* (`--category offer`), and the compiler emits `\b<tool>\b.*<escaped discriminator>`, using `.*` so flag order does not matter. Verified accepted by qm for all 22 rules across 6 fragments. The general form: **where a constraint is invariant, generate it rather than asking an author to remember it, and validate the generated result.**
+
+**Where authoritative validation actually happens.** The compiler reimplements qm's two pattern constraints natively so it can run in this repo, which has no `package.json` and no qm install by design (and Node 22 locally, below qm's floor — gate G26). A reimplementation can drift from the real thing, so the layering is deliberate and worth stating:
+
+| Layer | Runs where | Authority |
+|---|---|---|
+| Native checks in `build-tool-policy.mjs` + `evals/run.mjs` | This repo, every eval run | Early warning. Catches the error at authoring time. Could drift. |
+| `--qm-dir <path>` on the compiler | Anywhere qm is installed | qm's real `parseToolDescriptor`. Run it from the deployment directory before publishing a tool. |
+| `qm check` / `qm sandbox publish` | Deployment directory | **The backstop that cannot be bypassed.** qm refuses a bad descriptor outright. |
+
+So a drifted native check cannot ship a broken rule to production — it can only fail to warn early. That is an acceptable trade for keeping this repo dependency-free, but it is a trade, not a free lunch.

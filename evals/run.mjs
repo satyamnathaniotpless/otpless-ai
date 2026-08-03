@@ -337,6 +337,7 @@ if (!exists(BUILD_TOOL_POLICY_SCRIPT)) {
     // entry — same phrase list as the markdown check above, now checked against compiled
     // `decision: "deny"` rules instead of prose.
     let denyHaystack = "";
+    const parsedFragments = new Map(); // filename -> parsed { approvals: [...] }, reused below
     for (const f of fragmentFiles) {
       let parsed;
       try {
@@ -345,6 +346,7 @@ if (!exists(BUILD_TOOL_POLICY_SCRIPT)) {
         row(false, `${f} is not valid JSON`, String(e.message || e));
         continue;
       }
+      parsedFragments.set(f, parsed);
       for (const entry of parsed.approvals || []) {
         if (entry.decision === "deny") {
           denyHaystack += " " + (entry.command || entry.pattern || "") + " " + (entry.reason || "");
@@ -354,6 +356,37 @@ if (!exists(BUILD_TOOL_POLICY_SCRIPT)) {
     denyHaystack = denyHaystack.toLowerCase();
     for (const cls of NEVER_DELEGATED_CLASSES) {
       row(denyHaystack.includes(cls), `compiled output has a "deny" rule covering "${cls}"`);
+    }
+
+    // The check this defect needed: qm rejects any `pattern` not anchored to its OWN tool's
+    // `\b<tool-id>\b`. build-tool-policy.mjs synthesises that anchor rather than trusting an
+    // author-written one (see command-policy.md §0) — this asserts the synthesis actually did
+    // its job, for every pattern-type approval in every compiled fragment. `command`-type
+    // entries are skipped here: qm anchors those itself (compileApproval), not this compiler.
+    console.log("\n-- tool-policy compiler: every synthesised pattern is anchored to its own tool --");
+    let anchorChecked = 0;
+    let anchorMisses = 0;
+    for (const [f, parsed] of parsedFragments) {
+      const toolId = f.replace(/\.approvals\.json$/, "");
+      for (const [i, entry] of (parsed.approvals || []).entries()) {
+        if (entry.pattern === undefined) continue;
+        anchorChecked++;
+        const expectedPrefix = `\\b${toolId}\\b`;
+        if (!entry.pattern.startsWith(expectedPrefix)) {
+          anchorMisses++;
+          row(
+            false,
+            `${f} approvals[${i}].pattern is not anchored to its own tool`,
+            `expected prefix "${expectedPrefix}", got "${entry.pattern}"`
+          );
+        }
+      }
+    }
+    if (anchorMisses === 0) {
+      row(
+        true,
+        `${anchorChecked} pattern-type approval(s) across ${parsedFragments.size} fragment(s) all start with their own tool's \\b<id>\\b anchor`
+      );
     }
   } catch (err) {
     const output = `${err.stdout || ""}${err.stderr || ""}`;
