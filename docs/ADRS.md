@@ -101,3 +101,70 @@ Recorded rather than quietly edited, because the failure is instructive: a corre
 **A consequence worth taking seriously.** The sandbox-tool descriptor carries two fields that are platform-enforced versions of guardrails we currently express only as prose: `egress[]` whitelists the hosts a tool may reach, and `approvals[{command|pattern, decision}]` gates specific invocations behind a human decision. A Notion tool declaring `egress: ["api.notion.com"]` *cannot* exfiltrate elsewhere — that is enforcement, where our command policy and skill text are instruction. Where a capability is available as both a connector and a tool, prefer the connector for credential handling, but treat `egress`/`approvals` as the model to aim at: our trust ladder should end up expressed in mechanisms the runtime enforces, not in paragraphs an agent could reason around.
 
 **This is the second mechanism we assumed and got wrong** — the first was `deploy/layers/` (see the ADR-001 correction). Both survived multiple review passes because reviewers checked our documents against each other and against the PRDs, none of which knew any better. Neither survived five minutes of running the real thing. The generalisable rule, now recorded in the department playbook: an integration contract written from a README is a hypothesis, and it stays a hypothesis until something executes against the actual system.
+
+## ADR-010 — Enforcement re-founded: reads via connectors, writes via tools we control
+
+**Supersedes the enforcement mechanism in ADR-004.** ADR-004's *policy* — L0/L1/L2 earned on evidence, six classes never delegated — stands unchanged. Its stated mechanism does not: it claims autonomy is "encoded in qm's predeclared command policy and per-scope security posture." Verified against `@yc-software/qm@0.1.4`: **neither a command policy nor a security posture exists.** Zero occurrences of either term. Those names came from the master PRD, written before anyone ran the software.
+
+### What qm actually provides
+
+| Mechanism | Where it lives | What it enforces |
+|---|---|---|
+| `approvals[{command\|pattern, decision, reason}]` | `sandbox/tools/<id>/tool.json` | `decision` is exactly `"require_approval"` or `"deny"`. Per-invocation, matched on an exact command or a pattern (≤256 chars). |
+| `egress[host, …]` | same descriptor | Hosts a tool may reach |
+| `securityScreen {backend:"proxy", provider, endpoint, rollout}` | `qm.config.jsonc` | Content screening through a proxy |
+| Connector scoping | Admin UI | What an OAuth grant can touch |
+
+**The trust ladder maps onto `decision` natively**, which is the happy part of this finding:
+
+| Our level | Descriptor state |
+|---|---|
+| Never delegated | `decision: "deny"` — no human can approve it inline |
+| L0, drafts-only | `decision: "require_approval"` |
+| L1 / L2, promoted | the entry is **absent** for that pattern |
+
+A promotion becomes a diff to a tool descriptor. Descriptors ship in the deployment layer, which is versioned and published — so every promotion is an auditable version bump rather than a claim in prose. That is strictly better than the file we invented.
+
+### The constraint that drives the decision
+
+**`approvals` are a property of tool descriptors and nothing else.** They therefore do not gate connector-mediated actions. If Scout sends mail through the Google connector, our approval rules are not in that path; whatever gate exists is inside core, configured through Admin, and unverified from the CLI.
+
+So: **reads through connectors, writes and sends through tools we own.**
+
+- **Reads** — query the Applicants DB, read a thread, list events. Low blast radius, nothing leaves, nothing changes. Connector convenience is worth having, and OAuth credential handling is better than anything we would build.
+- **Writes and sends** — draft or send mail, write a Notion row, create an invite, post to Slack. These are exactly what the guardrails exist for, so they go through sandbox tools carrying `approvals` we author and `egress` we pin. Full control of the gate, at the cost of shipping a CLI binary per system.
+
+Where a capability is available both ways, the split above decides it. This is a hybrid on purpose: it buys enforcement where enforcement matters and takes the free path everywhere else.
+
+### Consequence for G27, which is now load-bearing rather than hygiene
+
+Core logs `SANDBOX_BACKEND=sprites without SPRITES_EGRESS_PROXY_URL — sandboxes run with NO egress enforcement (fail-open)`. That means **`egress[]` declarations are advisory until the egress proxy is configured.** G27 is not a nice-to-have that improves posture; it is the switch that turns a declared host allowlist into an enforced one. A `notion` tool declaring `egress: ["api.notion.com"]` constrains nothing until G27 closes.
+
+### Pattern constraints, learned by having qm reject a rule (2026-08-02)
+
+A probe tool was written to verify the primitive before building on it. qm refused the first descriptor:
+
+```
+approvals[0].pattern must refer to its own tool binary by starting with
+\bpolicy-probe\b and may not use a top-level alternative
+```
+
+Three constraints follow, none of them documented anywhere we had read:
+
+1. **A pattern must be anchored to its own tool's binary name** — it begins `\b<tool-id>\b`. A tool cannot write rules about another tool's commands, which is a sensible isolation property and worth relying on.
+2. **Patterns are regex with word boundaries**, not POSIX bracket expressions. `[[:space:]]` was rejected; `\s` is correct.
+3. **No top-level alternation.** You cannot write one rule covering `send|delete|update`. Each action needs its own entry.
+
+The third constraint shapes the policy document directly: **one action-class, one rule, one reason string.** That is more verbose than a combined pattern would be, and better — every rule is individually auditable, and the `reason` a human sees at the approval prompt is specific to the action rather than generic across three of them.
+
+Recorded because it is the shape of the thing we now depend on, and because it is the first constraint in this entire build that we discovered by *asking the platform* rather than by shipping something wrong and finding out later.
+
+### What remains unverified, and must be before anything is promoted
+
+- Whether core offers an approval surface for connector actions at all, and how it is configured. If it does, the split above may be relaxable — but not on assumption.
+- Whether `require_approval` surfaces in Slack, the web UI, or both.
+- Whether `qm rollback --to <digest>` works. Untested. Nothing gains deploy rights before it is proven against a deliberately broken layer.
+
+### Why this is recorded as a re-founding rather than an edit
+
+Four phases of work assumed an enforcement mechanism that does not exist, and every review passed because reviewers compared our documents against each other and the documents agreed. This is the third such failure (`deploy/layers/`, then MCP, now this) and the most serious, because the other two were plumbing and this one is the safety story. The generalisable rule already in the department playbook now has a third instance: **a mechanism is a hypothesis until something executes against it.** Governance models are not exempt — they are the most important thing to test, and were the last thing we tested.

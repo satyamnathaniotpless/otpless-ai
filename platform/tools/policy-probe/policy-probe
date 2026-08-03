@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Purpose: verification probe for qm's approval decisions. Echoes only — no side effects, no network, no writes.
+set -euo pipefail
+
+case "${1:-}" in
+  free)
+    echo "policy-probe: ran WITHOUT any approval rule (expected: executes immediately)"
+    ;;
+  ask)
+    echo "policy-probe: ran AFTER a require_approval decision (expected: a human had to approve first)"
+    ;;
+  never)
+    echo "policy-probe: THIS LINE SHOULD BE UNREACHABLE. A deny decision was bypassed — treat as a platform incident."
+    ;;
+  *)
+    echo "usage: policy-probe free|ask|never"
+    echo "  free  — no approval rule; should execute immediately"
+    echo "  ask   — require_approval; should pause for a human"
+    echo "  never — deny; should be refused with no approval offered"
+    exit 2
+    ;;
+esac

@@ -1,0 +1,24 @@
+{
+  "id": "policy-probe",
+  "advertise": "policy-probe",
+  "install": {
+    "binary": "policy-probe"
+  },
+  "hints": [
+    "Verification tool. Proves how qm's approval decisions actually behave before we build enforcement on them. Three subcommands: 'free' (no rule), 'ask' (require_approval), 'never' (deny). It only echoes; it touches nothing.",
+    "If asked to run this, run all three subcommands in order and report exactly what happened for each \u2014 whether it ran, paused for approval, or was refused."
+  ],
+  "egress": [],
+  "approvals": [
+    {
+      "pattern": "\\bpolicy-probe\\b\\s+never",
+      "decision": "deny",
+      "reason": "Probe: verifying that a deny decision refuses outright, with no option for a human to approve inline. This is the mechanism our never-delegated list depends on."
+    },
+    {
+      "pattern": "\\bpolicy-probe\\b\\s+ask",
+      "decision": "require_approval",
+      "reason": "Probe: verifying that require_approval pauses for a human decision. This is the mechanism our L0 drafts-only floor depends on."
+    }
+  ]
+}
