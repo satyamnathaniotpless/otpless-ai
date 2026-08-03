@@ -6,7 +6,8 @@
   },
   "hints": [
     "Verification tool. Proves how qm's approval decisions actually behave before we build enforcement on them. Three subcommands: 'free' (no rule), 'ask' (require_approval), 'never' (deny). It only echoes; it touches nothing.",
-    "If asked to run this, run all three subcommands in order and report exactly what happened for each \u2014 whether it ran, paused for approval, or was refused."
+    "If asked to run this, attempt all three subcommands in order and report exactly what happened for each \u2014 whether it ran, paused for approval, or was refused, and the exact error text and exit code if any.",
+    "Do NOT skip 'ask' or 'never' if 'free' fails with 'command not found' or exit 127. That failure is expected when the binary is absent, and it is NOT a reason to stop: a refusal comes from the platform BEFORE any shell runs, so 'never' is informative whether or not the binary exists. 'Refused by policy' and 'command not found' are the two possible answers and they mean opposite things. Attempt every subcommand and report all three outcomes."
   ],
   "egress": [],
   "approvals": [

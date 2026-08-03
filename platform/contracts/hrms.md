@@ -10,7 +10,7 @@ HRMS — the commercial system of record for payroll, leave, attendance, and com
 
 **Undecided**, and blocked behind the provider decision itself (gate G14) — neither Keka nor RazorpayX Payroll is one of qm's OAuth-provider connectors (confirmed live today: Google, Notion, Slack — `platform/contracts/README.md`). The two real candidates, per qm's actual mechanism set:
 
-1. **A sandbox tool** — `sandbox/tools/<id>/tool.json` plus an executable in the sandbox image, with `egress` pinned to the chosen provider's API host only, and `auth`/`approvals` fields making the read-only posture above platform-enforced rather than a skill-level promise.
+1. **A sandbox tool** — `sandbox/tools/<id>/tool.json` plus an executable in the sandbox image, with `egress` declaring the chosen provider's API host as intent (validated-only in contract v1 — ADR-010 correction §1; confinement comes from the G27 proxy, not this field), and `auth`/`approvals` fields making the read-only posture above platform-enforced rather than a skill-level promise.
 2. **A plugin** — a prebuilt image running alongside the qm services, declared in `qm.config.jsonc`, if the chosen provider's integration needs its own long-running service rather than a callable tool.
 
 Neither is chosen, and the choice cannot be made until the provider itself is chosen (gate G14).
@@ -60,7 +60,7 @@ No HRMS-sourced field value — a balance, a punch, an LOP amount, an exit date 
 
 ## Capability gaps today
 
-No mechanism exists yet for either candidate provider, and none can be built until the provider decision (gate G14) lands (see "Mechanism"). This is the primary gap: once G14 lands, the fix is a sandbox tool (egress-pinned to that provider's API) or a plugin — never a raw HTTP call or a scraped export, per CLAUDE.md conventions and the pattern set by ADR-007 / `gmail.md`. Until then, every skill that depends on this contract runs against synthetic fixture data only — never a real employee's real leave balance — matching the pre-gate convention other contracts use (e.g. `notion.md`'s scratch-location rule). No push/subscribe mechanism is assumed either way; treat any future HRMS mechanism as poll-only until proven otherwise, and set cron cadence in `crons.md` accordingly once it exists.
+No mechanism exists yet for either candidate provider, and none can be built until the provider decision (gate G14) lands (see "Mechanism"). This is the primary gap: once G14 lands, the fix is a sandbox tool (egress declared to that provider's API, per ADR-010 correction §1) or a plugin — never a raw HTTP call or a scraped export, per CLAUDE.md conventions and the pattern set by ADR-007 / `gmail.md`. Until then, every skill that depends on this contract runs against synthetic fixture data only — never a real employee's real leave balance — matching the pre-gate convention other contracts use (e.g. `notion.md`'s scratch-location rule). No push/subscribe mechanism is assumed either way; treat any future HRMS mechanism as poll-only until proven otherwise, and set cron cadence in `crons.md` accordingly once it exists.
 
 ## Credentials required
 

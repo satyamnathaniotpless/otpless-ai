@@ -10,7 +10,7 @@ India-specific candidate and employee messaging channel: candidates and employee
 
 **Undecided.** WhatsApp Business is not one of qm's OAuth-provider connectors (confirmed live today: Google, Notion, Slack — `platform/contracts/README.md`); there is no fourth "WhatsApp" connector to register. The two real candidates, per qm's actual mechanism set:
 
-1. **A sandbox tool** — `sandbox/tools/<id>/tool.json` plus an executable in the sandbox image, with `egress` pinned to the WhatsApp Business (Cloud) API host(s) only, and `approvals` encoding the platform-enforced gate on any send-shaped invocation.
+1. **A sandbox tool** — `sandbox/tools/<id>/tool.json` plus an executable in the sandbox image, with `egress` declaring the WhatsApp Business (Cloud) API host(s) as intent (validated-only in contract v1 — ADR-010 correction §1; confinement comes from the G27 proxy, not this field), and `approvals` encoding the platform-enforced gate on any send-shaped invocation.
 2. **A plugin** — a prebuilt image running alongside the qm services, declared in `qm.config.jsonc`, if the integration needs its own long-running service (e.g. a webhook receiver for inbound messages/delivery receipts) rather than a callable tool.
 
 Neither is chosen. This is a build decision to make once an account exists (gate G20), not a data-shape decision — see "Capability gaps today."
@@ -63,7 +63,7 @@ If a draft would need any of the above to make sense, the draft is wrong, not th
 
 ## Capability gaps today
 
-**No mechanism exists at all** — not draft/read/label like Gmail, nothing, and no connector to register either (see "Mechanism"). This is the largest capability gap of any contract in this index: building a sandbox tool (egress-pinned to the WhatsApp Business Cloud API) or standing up a plugin, once an account exists, is the fix — never a raw HTTP call, never a headless-browser workaround, per CLAUDE.md's MCP-only rule (read, in this repo, as "platform-mechanism-only": connector, sandbox tool, or plugin — never a bypass) and ADR-007. Until it exists, every skill that would use this channel outputs message text only, for a human to paste and send manually — the bridge already named in `PRD_Recruiting_System.md` §6 and the recruiter/onboarder scope files.
+**No mechanism exists at all** — not draft/read/label like Gmail, nothing, and no connector to register either (see "Mechanism"). This is the largest capability gap of any contract in this index: building a sandbox tool (egress declared to the WhatsApp Business Cloud API, per ADR-010 correction §1) or standing up a plugin, once an account exists, is the fix — never a raw HTTP call, never a headless-browser workaround, per CLAUDE.md's MCP-only rule (read, in this repo, as "platform-mechanism-only": connector, sandbox tool, or plugin — never a bypass) and ADR-007. Until it exists, every skill that would use this channel outputs message text only, for a human to paste and send manually — the bridge already named in `PRD_Recruiting_System.md` §6 and the recruiter/onboarder scope files.
 
 Two further gaps sit on top of "build the mechanism," each its own human gate, and neither is closed by the mechanism existing:
 

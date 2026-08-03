@@ -47,7 +47,7 @@ Scout can draft an email. The worst outcome is a bad message a human sent. **The
 
 Concretely it must never, at any trust level:
 
-- Modify enforcement configuration — whatever mechanism the re-founding lands on (tool `approvals`, `egress`, `securityScreen`)
+- Modify enforcement configuration — tool `approvals` (the real gate), `securityScreen`, and `SPRITES_EGRESS_PROXY_URL` (the only egress control; a tool's own `egress[]` list is validated-only in contract v1 and enforces nothing — ADR-010 correction §1)
 - Modify the never-delegated list, or any file that compiles into it
 - Merge any pull request, including a trivial one
 - Grant itself or any scope a credential, a token, or a broader connector scope

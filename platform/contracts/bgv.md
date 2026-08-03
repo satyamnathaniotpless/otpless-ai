@@ -10,7 +10,7 @@ Background verification for new hires — identity documents, employment history
 
 **Undecided**, and blocked behind the vendor decision itself (gate G18) — neither SpringVerify nor OnGrid is one of qm's OAuth-provider connectors (confirmed live today: Google, Notion, Slack — `platform/contracts/README.md`). The two real candidates, per qm's actual mechanism set:
 
-1. **A sandbox tool** — `sandbox/tools/<id>/tool.json` plus an executable in the sandbox image, with `egress` pinned to the chosen vendor's API host only, and `approvals` encoding the platform-enforced gate on any initiate-check invocation.
+1. **A sandbox tool** — `sandbox/tools/<id>/tool.json` plus an executable in the sandbox image, with `egress` declaring the chosen vendor's API host as intent (validated-only in contract v1 — ADR-010 correction §1; confinement comes from the G27 proxy, not this field), and `approvals` encoding the platform-enforced gate on any initiate-check invocation.
 2. **A plugin** — a prebuilt image running alongside the qm services, declared in `qm.config.jsonc`, if the chosen vendor's integration needs its own long-running service (e.g. a webhook receiver for status-change callbacks) rather than a callable tool.
 
 Neither is chosen, and the choice cannot even be made until the vendor itself is chosen (gate G18).
@@ -52,7 +52,7 @@ Not applicable today — this contract authorizes no writes yet (see "What we wr
 
 ## Capability gaps today
 
-No mechanism exists for either candidate vendor, and none can be built until the vendor decision (gate G18) lands (see "Mechanism"). This is the primary gap: once G18 closes, the fix is a sandbox tool (egress-pinned to the chosen vendor's API) or a plugin — never a raw HTTP call, never a scraped vendor portal, per CLAUDE.md conventions and ADR-007 (the draft is the boundary, not a workaround to route around a missing one). Until then, every BGV-touching skill runs against synthetic fixture data only and every real initiation is a manually-submitted portal request. No push/subscribe mechanism is assumed either way; treat any future BGV mechanism as poll-only until proven otherwise, with cadence set in `crons.md`.
+No mechanism exists for either candidate vendor, and none can be built until the vendor decision (gate G18) lands (see "Mechanism"). This is the primary gap: once G18 closes, the fix is a sandbox tool (egress declared to the chosen vendor's API, per ADR-010 correction §1) or a plugin — never a raw HTTP call, never a scraped vendor portal, per CLAUDE.md conventions and ADR-007 (the draft is the boundary, not a workaround to route around a missing one). Until then, every BGV-touching skill runs against synthetic fixture data only and every real initiation is a manually-submitted portal request. No push/subscribe mechanism is assumed either way; treat any future BGV mechanism as poll-only until proven otherwise, with cadence set in `crons.md`.
 
 ## PII handling (hard rule, not a style preference)
 

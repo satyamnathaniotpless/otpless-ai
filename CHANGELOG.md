@@ -1,5 +1,33 @@
 # Changelog
 
+## v1.2.0 — 2026-08-03 · Enforcement re-founded on real qm mechanisms
+- Safety model rebuilt on mechanisms qm actually has, after finding it was documented against a "command policy" and "security postures" qm does not implement.
+- `platform/deploy-layer/otpless/command-policy.md` rewritten as a compilation source (`<!-- policy-table -->` blocks, policy as data) and `platform/scripts/build-tool-policy.mjs` (new) compiles it into qm `approvals[]` descriptors — 22 `deny` rules staged across six write tools that do not exist yet (`gmail-send`, `notion-write`, `slack-send`, `calendar-invite`, `whatsapp-send`, `hrms-write`).
+- `platform/scripts/verify-live-layer.mjs` (new) — first check that reads the live deployment instead of comparing our documents to each other; signed read of the running core confirms every approval rule actually in force. Ran green against live core.
+- `evals/run.mjs` §4 strengthened: runs the compiler and verifies all six never-delegated classes compile to `deny` in the compiled JSON, not merely the markdown; confirmed red-when-broken.
+- Deployment layer published as v8 (image digest unchanged — descriptors travel in the layer).
+- `egress` corrected across six files (`platform/contracts/{hrms,whatsapp,bgv,gmail,README}.md`, `docs/proposals/platform-agent.md`) — it is validated-only in qm contract v1, not the platform-enforced host allowlist it was described as.
+- ADR-010 correction (2026-08-03, `docs/ADRS.md`): egress doesn't enforce and closing G27 won't change that; `approvals` DO reach core intact (verified live, `status: applied`, rules verbatim); the earlier probe measured a stale sandbox, not an ungated one; a custom `sandbox/Dockerfile` can silently stop copying tool binaries.
+- Open, not promoted on: runtime behavior of `approvals` (whether `deny` refuses outright and `require_approval` pauses) unverified by a live agent command; `qm rollback` unproven; gate G27 (sandbox egress proxy) still open.
+- Decisions: policy is compiled data, verified by reading the live deployment rather than comparing documents.
+
+## v1.1.0 — 2026-08-02 · Otto is live · P5 packs loaded onto the deployment
+
+The platform went from "built and gated" to running. Recorded late — this entry was written on 2026-08-03 from the commit history, because the day it happened went unlogged.
+
+- **Otto live on Fly.io (`sin`)** — 5 services (core, web-ui, admin, portal, auth), Managed Postgres, Tigris object storage, Sprites sandbox backend. `qm check --live` green including an S3 round trip. Portal at `otpless-portal.fly.dev`. Everything the first real deploy taught is in `docs/RUNBOOK_DEPLOY.md` §4b and `docs/reports/DEPLOY-live.md`.
+- **`platform/scripts/build-sandbox-layer.mjs`** — the join between our packs and the deployment, and the answer to how `packs/` reaches a sandbox that only accepts `skills/<id>/<file>`. Verifies frontmatter, reference resolution, bundle size against the 1 MB core API limit, PII, and path collisions; rewrites relative config references as it maps.
+- **Recruiting packs loaded — deployment layer v6**: 15 skills (shared + recruiting), integration contracts, and a per-deployment `user.md` that stays out of git.
+- **The recruiting agent is named Scout** (gate G8 closed), and its disclosure line names the operator rather than a role title.
+- **Otto naming** — the platform is Otto; the harness stays qm. Every CLI command, config file, and package name (`qm up`, `qm.config.jsonc`, `@yc-software/qm`) is unchanged, because that is what upstream docs and help output call it.
+- **ADR-009: qm has no MCP.** External access is connectors (OAuth via Admin + `/keychain`), sandbox tools, or plugins. Contracts that described MCP were corrected, along with the template that would have propagated the error to the next one. ADR-006's capability premise amended in the same pass — the Slack-can't-read-reactions claim was false; that decision stands on its security argument alone.
+- **ADR-010: enforcement re-founded** on `approvals`/`egress`, with a probe written to test the primitive before building on it.
+- **`docs/AGENT_DEPLOY_ACCESS.md`** — what a session actually needs to run the deploy loop: two Fly tokens, not the other fifteen secrets, because `qm up` verifies secret *names* via `fly secrets list` and never values.
+- **`docs/proposals/platform-agent.md`** — a proposal for the agent that would maintain Otto itself, recommending build-but-not-yet with an explicit exit criterion.
+- Gates: G8 closed, G12 closed as obsolete, G13 reframed to connector send, G27 (sandbox egress proxy) and G28 (Resend sending domain) added from live observation.
+- Evals grew to 13 check groups. Two of the additions found real defects in the harness itself: the PII walk was blind to `.md.example` files (four carried the founder's real email), and the cross-reference check silently stopped scanning after the first fenced code block.
+- Decisions: depend on the published qm package rather than a fork; there is no `deploy/layers/` contract; skills and tool descriptors ship in the versioned deployment layer while tool binaries ship in the image, so the **layer version** is the signal a skills change landed, not the image digest.
+
 ## v1.0.0 — 2026-08-01 · P4 template out · roadmap complete
 - Build roadmap complete; platform enters maintenance mode. Deployment remains gated (gates G1–G9, G14–G25 open); no agent has run against a real person.
 - `docs/DEPARTMENT_AUTOMATION_PLAYBOOK.md` — the executable playbook for standing up department #2 and every department after: the model (process = code, everything specific = data), the six actual failure modes hit during P0–P3 with the lesson from each, build sequence, what `packs/shared` gives free, guardrail patterns that worked, parallel-build coordination (fresh-context review is not optional), and department #2 recommendation (support is the structural fit; founder decides).

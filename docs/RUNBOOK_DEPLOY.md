@@ -71,9 +71,10 @@ Executable procedure (pass condition, synthetic fixture, and failure action per 
 - [ ] Notion read/write round-trip on a synthetic applicant row
 - [ ] Gmail draft created from a fixture thread — NOT sent (L0)
 - [ ] Calendar event on agent calendar with human attendee, responseStatus readable
-- [ ] Command policy: attempt an L1 action at L0 → blocked and logged
+- [ ] Enforcement: attempt a `deny`-ruled invocation → refused outright, with no inline approval offered; attempt a `require_approval` one → pauses for a human. (Not "command policy" — qm has none. The mechanism is `approvals[]` on tool descriptors; see ADR-010 and its 2026-08-03 correction.)
 - [ ] Kill test: close all human sessions 48h → crons still fire, digest still posts
 - [ ] `node evals/run.mjs` green in CI on a no-op PR
+- [ ] `node platform/scripts/verify-live-layer.mjs --config <deploy>/qm.config.jsonc` green — the only check that reads the **running** deployment rather than comparing our documents to each other. It prints every approval rule live on core, and names any tool carrying none as explicitly ungated. Needs `flyctl` on PATH and `FLY_API_TOKEN`; takes ~60–90s.
 
 ## 4b. Observed on the first live deployment (2026-08-02)
 
@@ -87,7 +88,10 @@ Everything below was hit for real on the way to a green stack. Recorded so the n
 | **`AUTH_EMAIL_FROM` wants an address, not a name** | The setup prompt reads like a display-name field; entering a name makes auth refuse to boot with `must be a verified sender address`. | Use a bare address. `onboarding@resend.dev` works without domain verification but only delivers to the Resend account owner (gate G28). |
 | **Machines park after 10 failed restarts** | Once a config error has crash-looped a machine, Fly stops retrying. It stays `stopped`/`created` even after the config is fixed. | `qm up` to apply staged secrets, then `fly machine start <id> -a <app>`. A plain restart does **not** apply staged secrets. |
 | **First image pull is slow** | The core image took ~83s to pull, so the machine sits in `created` after a blue-green cutover and `check --live` reports `machine state is created instead of started`. | Start it; not an error. |
-| **Egress is fail-open** | Core logs `SANDBOX_BACKEND=sprites without SPRITES_EGRESS_PROXY_URL — sandboxes run with NO egress enforcement`. | Gate G27. Close before any real candidate data. |
+| **Egress is fail-open** | Core logs `SANDBOX_BACKEND=sprites without SPRITES_EGRESS_PROXY_URL — sandboxes run with NO egress enforcement`. | Gate G27. Close before any real candidate data. Note the proxy is the *only* egress control: per-tool `egress[]` lists are validated-only in contract v1 and enforce nothing (ADR-010 correction §1). |
+| **Publishing a sandbox image does not retrofit existing sandboxes** | `qm sandbox publish` reports the app "now **boots** sandboxes from `<image>`" — future tense. A sandbox that already exists keeps the image it was created with, so a tool binary added today can be missing from an agent's shell tomorrow (`command not found`, exit 127) while being demonstrably present in the pinned image. | Confirm with `docker run --rm <pinned digest> sh -c 'command -v <binary>'` before blaming the layer. Getting the binary into an existing sandbox needs that sandbox recreated; there is no `qm sandbox reset`. |
+| **A skills-or-descriptor-only change does not move the image digest** | Skills and tool *descriptors* travel in the versioned deployment layer; only tool *binaries* are baked into the image. Publishing a descriptor edit re-exports the identical digest. | The **layer version** is the signal (`deployment layer: v8 <hash>`), not the digest. Verify with `platform/scripts/verify-live-layer.mjs`. |
+| **A custom `sandbox/Dockerfile` silently stops copying tool binaries** | With no custom Dockerfile, qm generates `COPY tools/<dir>/<binary> /usr/local/bin/<binary>` per tool. With one, qm uses it verbatim and appends *only* a presence check — the COPY lines are not added. | If you add a `sandbox/Dockerfile`, copy every tool binary in it yourself. The appended `command -v` check fails the build, so this cannot ship broken — but the error names PATH, not the missing COPY. |
 
 Sequence that worked, end to end:
 

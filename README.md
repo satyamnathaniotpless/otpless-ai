@@ -63,5 +63,6 @@ We adopt [yc-software/qm](https://github.com/yc-software/qm) (MIT) as the harnes
 - [x] Analyst + Culture & Growth packs built, WhatsApp contract (not live — gates G1–G9, G14–G25)
 - [x] Otto live — Fly.io `sin`, 5 services healthy, Postgres + Tigris, portal at `otpless-portal.fly.dev` (2026-08-02)
 - [x] Recruiting packs loaded onto Otto — deployment layer v6: 15 skills (shared + recruiting), integration contracts, and per-deployment `user.md`. Agent named **Scout** (G8 closed)
-- [ ] Recruiter agent proven in shadow mode, trust ladder L0 → L1 — blocked on a real triage run and the enforcement re-founding (ADR-004 describes a command policy qm does not have)
+- [x] Enforcement re-founded on real qm mechanisms — command policy compiles to `approvals[]` descriptors (`platform/scripts/build-tool-policy.mjs`), verified against the live deployment (`platform/scripts/verify-live-layer.mjs`), deployment layer v8, ADR-010 correction recorded (2026-08-03)
+- [ ] Recruiter agent proven in shadow mode, trust ladder L0 → L1 — blocked on a real triage run and on verifying `approvals` enforcement at runtime (`deny`/`require_approval` behavior staged but not yet exercised by a live command)
 - [x] Department automation playbook (`docs/DEPARTMENT_AUTOMATION_PLAYBOOK.md`) — template out to department #2, recommendation: support

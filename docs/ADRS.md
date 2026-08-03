@@ -168,3 +168,72 @@ Recorded because it is the shape of the thing we now depend on, and because it i
 ### Why this is recorded as a re-founding rather than an edit
 
 Four phases of work assumed an enforcement mechanism that does not exist, and every review passed because reviewers compared our documents against each other and the documents agreed. This is the third such failure (`deploy/layers/`, then MCP, now this) and the most serious, because the other two were plumbing and this one is the safety story. The generalisable rule already in the department playbook now has a third instance: **a mechanism is a hypothesis until something executes against it.** Governance models are not exempt — they are the most important thing to test, and were the last thing we tested.
+
+---
+
+## ADR-010 correction (2026-08-03) — three of its premises re-checked against source, one of them wrong
+
+ADR-010 was written from qm's error messages and core's logs. It has now been checked against `@yc-software/qm@0.1.4`'s actual source and against the live deployment's own state. Two claims are confirmed, one is wrong, and the probe result that motivated the whole re-founding turns out to have measured nothing.
+
+### 1. `egress[]` does not enforce, and closing G27 will not make it enforce
+
+ADR-010 said closing G27 "is the switch that turns a declared host allowlist into an enforced one." That is not supported. qm's own layer validator emits:
+
+```
+tool "<id>" declares broad egress "<host>"; egress is validated-only in contract v1
+```
+
+An audit of every reference to `egress` in the package (`grep -rn egress dist/src/`) finds exactly four: the type declaration, a shape check that it is an array of strings, a rejection of URLs and paths, and that warning. **Nothing consumes it.** There is no iptables, nftables, firewall, or proxy-allowlist code anywhere in the CLI.
+
+So there are two distinct things, and ADR-010 conflated them:
+
+| | What it is | Status |
+|---|---|---|
+| `SPRITES_EGRESS_PROXY_URL` (G27) | A blanket egress proxy for all sandbox traffic | Unset — sandboxes are fail-open |
+| `egress[]` on a tool descriptor | A per-tool host allowlist | **Validated-only in contract v1.** Shipped to core, consumed by nothing we can observe |
+
+Closing G27 buys blanket confinement. It does not make a `notion` tool's `egress: ["api.notion.com"]` mean anything, because that list is not what the proxy is configured from. **Do not write per-tool `egress[]` lists and count them as a control.** Write them as documentation of intent — which is all contract v1 offers — and get the confinement from G27's proxy. G27 stays load-bearing; the reason changes.
+
+### 2. `approvals` reach core intact, and the trust-ladder mapping is real
+
+Confirmed by reading the live deployment back rather than by inference. A signed `GET /v1/deployment-layer` against `otpless-core` returns `status: applied`, `runtimeContentHash == contentHash`, and the `policy-probe` descriptor **verbatim, both approval rules present** — the `deny` on `\bpolicy-probe\b\s+never` and the `require_approval` on `\bpolicy-probe\b\s+ask`.
+
+This is worth more than it looks. It establishes that the descriptor round-trips: our authored rules are what core holds, byte for byte, and the runtime hash matches the stored hash so the runtime has them too. Two further supports:
+
+- `compileApproval` is exported from `@yc-software/qm/contract`, the package's declared "supported programmatic surface for conformance tests." Pattern compilation is contract, not incidental — third parties are expected to compile patterns the way core matches them.
+- qm validates approvals aggressively at publish time: valid regex, ≤256 chars, rejected for catastrophic backtracking, and required to be anchored to the tool's own binary. Nobody builds that much validation around a field they ignore.
+
+The trust-ladder mapping in ADR-010 therefore stands, and the policy compiler is cleared to build on it.
+
+### 3. The probe measured nothing — the sandbox was stale, not ungated
+
+Scout reported `policy-probe: not found`, exit 127, and `example-tool` missing too. That was read as possibly meaning the rules never fired. It means neither of those things:
+
+- The published image at the pinned digest `…66816a6e` **contains and runs the binary.** Pulled and executed directly: `/usr/local/bin/policy-probe` is present, and `policy-probe free` prints its expected line.
+- Core is pinned to that exact image — `printenv FLY_BASE_IMAGE` on `otpless-core` returns it, with `SANDBOX_BACKEND=sprites`.
+- Scout's shell reported `PATH=/home/sprite/.local/bin:/.sprite/bin:…`. The image's own PATH is `/opt/agent-venv/bin:/usr/local/sbin:/usr/local/bin:…`. **Scout was not running this image.**
+
+`qm sandbox publish` records the pin and `flyPinSandbox` reports the app "now boots sandboxes from `<image>`" — *boots*, future tense. Publishing a new sandbox image does not retrofit a sandbox that already exists. The most likely reading is that Scout's sprite is durable and predates the pin; the alternative is that sprites in this configuration never boot our image at all. These are distinguishable by one observation: whether a freshly created sandbox has the binary.
+
+**But the approval test does not need the binary at all, and this is the part we got wrong twice.** Reason it through from what was actually observed:
+
+- Scout ran `policy-probe free` and the *shell* returned exit 127. No approval rule matches `free`, so executing it was the correct behaviour, and 127 is just the missing binary. That arm was never a test of gating.
+- `ask` and `never` were **not attempted** — Scout skipped them, reasonably, on the grounds that the binary was missing.
+
+A `deny` decision must refuse the invocation *before* a shell runs anything. So `policy-probe never` is informative regardless of whether the binary exists: **refused → the rule fired; exit 127 → the rule did not fire and `approvals` is gating nothing in this configuration.** The missing binary is not an obstacle to the test; it is irrelevant to it. Two rounds were spent trying to fix the sandbox when the decisive observation cost one command the whole time.
+
+So the sandbox staleness is a real packaging defect worth fixing, but it is **not** a blocker on verifying `approvals`. Runtime behaviour — does `deny` refuse outright, does `require_approval` pause, and where does the prompt surface — remains unverified; nothing is promoted on it; and the next step is one command, not a rebuild.
+
+Two lessons, the second more useful than the first: a null result is not evidence about the thing you were testing until you have shown the test could have produced a positive. And when a test looks blocked, re-derive what each arm actually measures before going to fix the blocker — the probe was well designed, the harness around it was not, and the diagnosis of *why* it was stuck was wrong on top of that.
+
+### 4. A packaging trap, recorded before it bites
+
+With **no** `sandbox/Dockerfile`, qm generates the image itself and emits `COPY tools/<dir>/<binary> /usr/local/bin/<binary>` for every tool. With a **custom** `sandbox/Dockerfile`, it uses that file verbatim and appends *only* a presence check — **it does not add the COPY lines.** Any custom Dockerfile must copy every tool binary itself.
+
+The presence check (`command -v` for each declared binary, failing the build) means this cannot ship silently broken, which is good design on qm's part. We currently have no custom Dockerfile and should keep it that way unless a tool needs a system package.
+
+### What this changes in practice
+
+- The policy compiler proceeds on `approvals`. `decision` values are contract; the mapping is sound.
+- `egress[]` is downgraded from control to documentation. Anywhere our docs treat it as enforcement, fix it.
+- Live state is now checkable, and that check is `platform/scripts/verify-live-layer.mjs`. Comparing our documents against each other is what produced four consecutive mechanism errors; comparing them against the running system is the fix.

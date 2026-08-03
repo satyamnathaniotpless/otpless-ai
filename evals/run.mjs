@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 // Purpose: zero-dependency eval harness — STRUCTURE, SKILL SHAPE, LINT, NEVER-DELEGATED
-// COVERAGE, GATE HYGIENE, SECRET-SHAPE GUARD, CROSS-REFERENCE, RATING FIXTURES, PROMOTION
-// GATE, EVIDENCE ROLLUP PII GUARD, and POLICY APPROVAL STATUS checks; exits non-zero on any
-// failure.
+// COVERAGE (now including the tool-policy compiler's own dry run and its compiled `deny`
+// rules — see docs/ADRS.md ADR-010), GATE HYGIENE, SECRET-SHAPE GUARD, CROSS-REFERENCE,
+// RATING FIXTURES, PROMOTION GATE, EVIDENCE ROLLUP PII GUARD, and POLICY APPROVAL STATUS
+// checks; exits non-zero on any failure.
 
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
@@ -99,6 +101,11 @@ const NEVER_DELEGATED_CLASSES = [
   "policy changes",
 ];
 const COMMAND_POLICY_PATH = "platform/deploy-layer/otpless/command-policy.md";
+
+// Compiles COMMAND_POLICY_PATH's rule tables into qm tool-descriptor approvals[] fragments
+// (docs/ADRS.md ADR-010). A phrase in a markdown file is not enforcement; a `deny` rule in the
+// compiler's own output is closer to it — see the check group below that runs this script.
+const BUILD_TOOL_POLICY_SCRIPT = "platform/scripts/build-tool-policy.mjs";
 
 const REQUIRED_SKILL_SECTIONS = ["trigger", "inputs", "process", "output contract", "failure behavior"];
 
@@ -272,12 +279,87 @@ if (piiHits === 0) row(true, `no disallowed addresses found across ${allPackMd.l
 // ---------------------------------------------------------------------------
 console.log("\n=== 4. NEVER-DELEGATED COVERAGE ===\n");
 
+// Weaker signal, kept as a cheap first check: the six phrases still have to appear in the
+// human-readable document at all. This alone was the entire check before ADR-010 — a phrase in
+// a markdown file is not enforcement, which is exactly why it is no longer the only check below.
 if (!exists(COMMAND_POLICY_PATH)) {
   row(false, COMMAND_POLICY_PATH, "file does not exist — cannot verify never-delegated coverage");
 } else {
   const text = readFile(COMMAND_POLICY_PATH).toLowerCase();
   for (const cls of NEVER_DELEGATED_CLASSES) {
-    row(text.includes(cls), `command-policy.md §4 mentions "${cls}"`);
+    row(text.includes(cls), `command-policy.md mentions "${cls}"`);
+  }
+}
+
+// Stronger signal, with real teeth: run the compiler (platform/scripts/build-tool-policy.mjs)
+// in dry-run mode — a red here fails the suite exactly like the sandbox-layer build check
+// below (§13) — and then again with --out against a throwaway temp directory so the six
+// classes can be verified as `deny` rules in the compiler's actual compiled output, not just
+// as prose. This is the check ADR-010/G-task asked for: a phrase in a document is not
+// enforcement; a `deny` rule in `<tool-id>.approvals.json` is closer to it.
+console.log("\n-- tool-policy compiler: dry run --");
+if (!exists(BUILD_TOOL_POLICY_SCRIPT)) {
+  row(false, BUILD_TOOL_POLICY_SCRIPT, "file does not exist — cannot compile or verify command-policy.md");
+} else {
+  try {
+    execSync(`node ${JSON.stringify(BUILD_TOOL_POLICY_SCRIPT)}`, {
+      cwd: ROOT,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    row(true, "build-tool-policy.mjs dry run passes (0 compile/validation failures)");
+  } catch (err) {
+    const output = `${err.stdout || ""}${err.stderr || ""}`;
+    const failureLines = output.split("\n").filter((l) => l.trim().startsWith("❌"));
+    row(
+      false,
+      "build-tool-policy.mjs dry run failed",
+      failureLines.length > 0
+        ? failureLines.map((l) => l.trim()).join(" | ")
+        : "see `node platform/scripts/build-tool-policy.mjs` output"
+    );
+  }
+
+  console.log("\n-- tool-policy compiler: six never-delegated classes are `deny` rules in the compiled output --");
+  let compileDir;
+  try {
+    compileDir = fs.mkdtempSync(path.join(os.tmpdir(), "otpless-tool-policy-"));
+    execSync(`node ${JSON.stringify(BUILD_TOOL_POLICY_SCRIPT)} --out ${JSON.stringify(compileDir)}`, {
+      cwd: ROOT,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    const fragmentFiles = fs.readdirSync(compileDir).filter((f) => f.endsWith(".approvals.json"));
+    row(fragmentFiles.length > 0, `compiler wrote ${fragmentFiles.length} tool fragment(s) to compile against`);
+
+    // Pool every `deny` entry's match value + reason across every tool fragment into one
+    // lowercased haystack, then require each of the six phrases to appear in at least one deny
+    // entry — same phrase list as the markdown check above, now checked against compiled
+    // `decision: "deny"` rules instead of prose.
+    let denyHaystack = "";
+    for (const f of fragmentFiles) {
+      let parsed;
+      try {
+        parsed = JSON.parse(fs.readFileSync(path.join(compileDir, f), "utf8"));
+      } catch (e) {
+        row(false, `${f} is not valid JSON`, String(e.message || e));
+        continue;
+      }
+      for (const entry of parsed.approvals || []) {
+        if (entry.decision === "deny") {
+          denyHaystack += " " + (entry.command || entry.pattern || "") + " " + (entry.reason || "");
+        }
+      }
+    }
+    denyHaystack = denyHaystack.toLowerCase();
+    for (const cls of NEVER_DELEGATED_CLASSES) {
+      row(denyHaystack.includes(cls), `compiled output has a "deny" rule covering "${cls}"`);
+    }
+  } catch (err) {
+    const output = `${err.stdout || ""}${err.stderr || ""}`;
+    row(false, "could not compile command-policy.md with --out to verify deny rules", output.split("\n").slice(-5).join(" | "));
+  } finally {
+    if (compileDir) fs.rmSync(compileDir, { recursive: true, force: true });
   }
 }
 
